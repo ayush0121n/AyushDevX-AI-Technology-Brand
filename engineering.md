@@ -7,15 +7,15 @@
 ## 1. Architecture
 
 **Frontend:**
-- Next.js (App Router)
-- React
+- TanStack Start (React 19 + Vite)
+- TanStack Router (file-system routing)
 - TypeScript
-- Tailwind CSS
-- shadcn/ui
+- Tailwind CSS v4 (Custom OKLCH design tokens)
+- Framer Motion
 
 **Backend:**
-- Next.js Server Actions
-- Next.js Route Handlers
+- TanStack Start Server Functions (SSR & API)
+- TanStack Start API Route Handlers
 
 **Database:**
 - Supabase PostgreSQL
@@ -311,11 +311,11 @@ Provide `.env.example` for documentation.
 
 ```env
 # Site
-NEXT_PUBLIC_SITE_URL=
+VITE_SITE_URL=http://localhost:3000
 
 # Supabase
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
+VITE_SUPABASE_URL=https://zkgixwywetajnogrihfy.supabase.co
+VITE_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 
 # AI (server-only — never expose to client)
@@ -330,12 +330,12 @@ The application will use a new production domain.
 
 Do not hardcode any previous Vercel URL.
 
-Use `NEXT_PUBLIC_SITE_URL` for:
+Use `VITE_SITE_URL` for:
 - SEO metadata
 - Sitemap generation
 - Canonical URLs
 - Open Graph tags
-- Metadata API
+- Page head metadata
 
 ---
 
@@ -360,8 +360,8 @@ Perform manual responsive testing on all major breakpoints.
 ## 20. Performance
 
 **Optimize:**
-- Images (next/image)
-- Fonts (next/font)
+- Images
+- Fonts
 - API calls
 - Database queries
 - AI requests
@@ -379,9 +379,9 @@ Avoid unnecessary client-side JavaScript.
 ## 21. SEO
 
 **Implement:**
-- Metadata API (Next.js)
-- Sitemap (app/sitemap.ts)
-- Robots.txt (app/robots.ts)
+- Page head metadata (TanStack Router route head hooks)
+- Sitemap generator (public/sitemap.xml)
+- Robots.txt (public/robots.txt)
 - Open Graph tags
 - Canonical URLs
 - Structured data where appropriate
@@ -406,7 +406,7 @@ Follow WCAG principles.
 **Production architecture:**
 
 ```text
-GitHub → Vercel → Next.js → Supabase
+GitHub → Vercel (SPA Mode / Node SSR) → TanStack Start → Supabase
 ```
 
 Use free tiers.

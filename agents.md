@@ -88,7 +88,7 @@ Do not assume the final domain name.
 Use environment variables for the production domain:
 
 ```env
-NEXT_PUBLIC_SITE_URL=https://your-new-domain.com
+VITE_SITE_URL=https://your-new-domain.com
 ```
 
 The final domain will be configured later.
@@ -354,7 +354,7 @@ Also implement:
 - Robots.txt
 - Structured data where appropriate
 
-Use `NEXT_PUBLIC_SITE_URL` for canonical URLs.
+Use `VITE_SITE_URL` for canonical URLs.
 
 ---
 
@@ -381,7 +381,7 @@ The application will be deployed as a NEW production website.
 Preferred architecture:
 
 ```text
-GitHub → Vercel → Next.js → Supabase
+GitHub → Vercel (SPA Mode / Node SSR) → TanStack Start → Supabase
 ```
 
 Use free tiers wherever possible.

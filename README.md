@@ -29,75 +29,56 @@ AYUSHDEVX
 ├── ui.md               ← Design & UX system
 ├── engineering.md      ← Technical architecture
 │
-├── app/
-│   ├── (public)/
-│   │   ├── page.tsx
-│   │   ├── ai-lab/
-│   │   ├── products/
-│   │   ├── projects/
-│   │   ├── knowledge-hub/
-│   │   ├── insights/
-│   │   ├── about/
-│   │   └── contact/
-│   ├── (admin)/
-│   │   └── dashboard/
-│   ├── api/
-│   │   ├── projects/
-│   │   ├── products/
-│   │   ├── resources/
-│   │   └── ai/
-│   └── layout.tsx
-│
-├── components/
-│   ├── ui/
-│   ├── layout/
-│   ├── projects/
-│   ├── products/
-│   ├── ai/
-│   ├── resources/
-│   └── admin/
-│
-├── lib/
-│   ├── supabase/
-│   ├── ai/
-│   │   ├── provider.ts
-│   │   ├── embeddings.ts
-│   │   ├── rag.ts
-│   │   ├── prompts.ts
-│   │   ├── validators.ts
-│   │   └── rate-limit.ts
-│   ├── utils/
-│   └── validators/
-│
-├── types/
-│   └── index.ts
-│
-├── supabase/
-│   └── migrations/
+├── src/
+│   ├── routes/
+│   │   ├── __root.tsx          ← TanStack root layout
+│   │   ├── index.tsx           ← Homepage
+│   │   ├── ai-lab.tsx          ← AI Lab tools hub
+│   │   ├── products.tsx        ← Digital products catalog
+│   │   ├── projects.tsx        ← Production projects
+│   │   ├── knowledge-hub.tsx   ← Document & PDF library
+│   │   ├── insights.tsx        ← Engineering articles
+│   │   ├── about.tsx           ← Brand positioning
+│   │   └── contact.tsx         ← Contact & inquiry form
+│   │
+│   ├── components/
+│   │   ├── site/               ← Core brand & layout components (Nav, Hero, Footer, etc.)
+│   │   ├── ui/                 ← Reusable UI components
+│   │   ├── ai/                 ← AI Lab widgets & components
+│   │   └── projects/           ← Project display components
+│   │
+│   ├── lib/
+│   │   ├── supabase/           ← Supabase client (client.ts, server.ts, types.ts)
+│   │   ├── ai/                 ← AI integrations & prompts
+│   │   └── utils/              ← Utility functions
+│   │
+│   └── styles.css              ← Tailwind v4 CSS design tokens
 │
 ├── public/
 │   ├── images/
 │   └── icons/
 │
-└── .env.example
+├── .env.example                ← Environment template (VITE_ convention)
+└── .env.local                  ← Local secrets (ignored by git)
 ```
 
 ---
 
 ## Tech Stack
 
-| Layer          | Technology              |
-|----------------|-------------------------|
-| Framework      | Next.js (App Router)    |
-| Language       | TypeScript              |
-| Styling        | Tailwind CSS            |
-| UI Components  | shadcn/ui               |
-| Database       | Supabase PostgreSQL     |
-| Auth           | Supabase Auth           |
-| Storage        | Supabase Storage        |
-| AI             | Open-source / Free APIs |
-| Deployment     | Vercel Free Tier        |
-| Source Control | GitHub                  |
+| Layer          | Technology                            |
+|----------------|---------------------------------------|
+| Framework      | TanStack Start (React 19 + Vite)      |
+| Routing        | TanStack Router (file-system based)   |
+| Language       | TypeScript                            |
+| Styling        | Tailwind CSS v4 + Custom OKLCH tokens |
+| UI Components  | Custom / Framer Motion                |
+| Database       | Supabase PostgreSQL (10 tables + RLS) |
+| Auth           | Supabase Auth                         |
+| Storage        | Supabase Storage (6 buckets)          |
+| AI             | Open-source / Free APIs               |
+| Deployment     | Vercel (SPA Mode / Node SSR)          |
+| Source Control | GitHub                                |
 
 ---
 
@@ -183,10 +164,10 @@ cp .env.example .env.local
 Required variables:
 
 ```env
-NEXT_PUBLIC_SITE_URL=
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
+VITE_SITE_URL=http://localhost:3000
+VITE_SUPABASE_URL=https://zkgixwywetajnogrihfy.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ```
 
 ---
@@ -197,7 +178,7 @@ This project is deployed on a NEW production domain.
 
 Do NOT reference the previous Vercel website.
 
-Set `NEXT_PUBLIC_SITE_URL` to your new domain when configuring deployment.
+Set `VITE_SITE_URL` to your new domain when configuring deployment.
 
 ---
 
