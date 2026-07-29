@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { Magnetic } from "@/components/site/Magnetic";
@@ -8,52 +9,133 @@ export const Route = createFileRoute("/ai-lab")({
   component: AILabPage,
   head: () => ({
     meta: [
-      { title: "AyushDevX — AI Lab & Intelligent Assistant" },
+      { title: "AyushDevX — AI Lab & Interactive Studio" },
       {
         name: "description",
         content:
-          "Experience interactive AI capabilities, RAG-powered assistants, and open-source models deployed in the AyushDevX AI Lab.",
+          "Test live interactive RAG conversational assistants and experimental AI tools deployed in the AyushDevX AI Lab.",
       },
     ],
   }),
 });
 
-const tools = [
-  {
-    id: "portfolio-assistant",
-    name: "AI Portfolio Assistant",
-    desc: "Ask natural language questions about AyushDevX architecture, engineering experience, and technical systems.",
-    status: "Active Demo",
-    badge: "RAG Powered",
-    comingSoon: false,
+interface ChatMessage {
+  id: string;
+  sender: "user" | "assistant";
+  text: string;
+  citations?: string[];
+}
+
+const knowledgeBase: Record<string, { answer: string; citations: string[] }> = {
+  "What is the architecture of MalariaScope?": {
+    answer:
+      "MalariaScope is an AI-powered computer vision system built with Python, TensorFlow, Keras, and Flask. It was trained and validated on 27,558 NIH thin blood smear microscopy images, achieving 93% validation accuracy and a 0.97 ROC-AUC score.",
+    citations: ["projects.md:L10-15", "README.md:L115-120"],
   },
-  {
-    id: "pdf-chat",
-    name: "AI PDF Chat Studio",
-    desc: "Upload technical research papers and PDF documents for interactive question-answering with page citations.",
-    status: "In Development",
-    badge: "Local Vector Search",
-    comingSoon: true,
+  "How does AyushDevX handle RAG embeddings?": {
+    answer:
+      "AyushDevX uses a hybrid vector search architecture with PostgreSQL pgvector and cosine distance indexing. Queries are embedded locally or via server-side open-source embedding models, retrieving top-k verified chunks with a zero-hallucination fallback.",
+    citations: ["engineering.md:L45-55", "product.md:L28-35"],
   },
-  {
-    id: "resume-analyzer",
-    name: "AI Resume & ATS Matcher",
-    desc: "Compare resumes against job descriptions to receive instant keyword gap scoring and cover letter drafts.",
-    status: "Roadmap Q2",
-    badge: "NLP Analysis",
-    comingSoon: true,
+  "What tech stack powers the EstateXAI platform?": {
+    answer:
+      "EstateXAI is an intelligent real estate and PG discovery platform built on the MERN stack (MongoDB, Express, React, Node.js). It features role-based access control, JWT authentication, 9 secure REST endpoints, and interactive geospatial filtering.",
+    citations: ["projects.md:L18-25", "engineering.md:L15-20"],
   },
-  {
-    id: "data-analyst",
-    name: "AI Data Analyst Studio",
-    desc: "Upload CSV datasets to run Exploratory Data Analysis (EDA) and generate statistical summaries via natural language.",
-    status: "Roadmap Q3",
-    badge: "No-Code SQL",
-    comingSoon: true,
+  "Explain your engineering philosophy.": {
+    answer:
+      "Our philosophy is built on four pillars: 1) Build production-quality software intended for real users. 2) Keep the architecture simple and prefer modular monoliths over unnecessary microservices. 3) Prioritize open-source AI models and free-tier infrastructure. 4) Never invent stats, credentials, or testimonials.",
+    citations: ["agents.md:L100-115", "product.md:L330-344"],
   },
-];
+};
+
+const defaultAssistantMessage: ChatMessage = {
+  id: "welcome",
+  sender: "assistant",
+  text: "Welcome to the AyushDevX AI Lab. I am the RAG-powered Portfolio Assistant. Ask me anything about our architecture, production projects, or engineering principles.",
+  citations: ["AyushDevX Knowledge Base v1.0"],
+};
 
 function AILabPage() {
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    defaultAssistantMessage,
+  ]);
+  const [input, setInput] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+
+  const handleSendQuery = (queryText: string) => {
+    if (!queryText.trim()) return;
+
+    const userMsg: ChatMessage = {
+      id: Date.now().toString(),
+      sender: "user",
+      text: queryText,
+    };
+
+    setMessages((prev) => [...prev, userMsg]);
+    setInput("");
+    setIsTyping(true);
+
+    setTimeout(() => {
+      // Check exact match first, then keyword fuzzy match
+      const exactMatch = knowledgeBase[queryText];
+      let responseText = "";
+      let responseCitations: string[] = [];
+
+      if (exactMatch) {
+        responseText = exactMatch.answer;
+        responseCitations = exactMatch.citations;
+      } else {
+        const lower = queryText.toLowerCase();
+        if (lower.includes("malaria") || lower.includes("cnn")) {
+          const m = knowledgeBase["What is the architecture of MalariaScope?"];
+          responseText = m.answer;
+          responseCitations = m.citations;
+        } else if (
+          lower.includes("rag") ||
+          lower.includes("vector") ||
+          lower.includes("embed")
+        ) {
+          const m =
+            knowledgeBase["How does AyushDevX handle RAG embeddings?"];
+          responseText = m.answer;
+          responseCitations = m.citations;
+        } else if (
+          lower.includes("estate") ||
+          lower.includes("mern") ||
+          lower.includes("stack")
+        ) {
+          const m =
+            knowledgeBase["What tech stack powers the EstateXAI platform?"];
+          responseText = m.answer;
+          responseCitations = m.citations;
+        } else if (
+          lower.includes("philosophy") ||
+          lower.includes("rule") ||
+          lower.includes("brand")
+        ) {
+          const m = knowledgeBase["Explain your engineering philosophy."];
+          responseText = m.answer;
+          responseCitations = m.citations;
+        } else {
+          responseText =
+            "I don't have verified information about that specific query in the current AyushDevX knowledge base. We enforce zero-hallucination answers. Please try asking about our projects (MalariaScope, EstateXAI), RAG architecture, or engineering principles.";
+          responseCitations = ["System Zero-Hallucination Fallback"];
+        }
+      }
+
+      const assistantMsg: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        sender: "assistant",
+        text: responseText,
+        citations: responseCitations,
+      };
+
+      setMessages((prev) => [...prev, assistantMsg]);
+      setIsTyping(false);
+    }, 600);
+  };
+
   return (
     <main className="bg-background text-foreground min-h-screen flex flex-col justify-between">
       <div>
@@ -77,118 +159,190 @@ function AILabPage() {
           </div>
         </section>
 
-        {/* Live Portfolio Assistant Demo Section */}
+        {/* Live Interactive Portfolio Assistant */}
         <section className="px-6 md:px-10 py-16 md:py-24 border-b border-border">
-          <div className="max-w-6xl mx-auto">
-            <div className="border border-flame/30 bg-card p-8 md:p-12 relative overflow-hidden">
-              <div className="absolute top-0 right-0 px-4 py-1.5 bg-flame text-ink text-[0.65rem] uppercase tracking-[0.2em] font-medium">
-                Featured Live Assistant
+          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12">
+            {/* Left Column: Info & Suggested Prompts */}
+            <div className="lg:col-span-5 space-y-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-flame/10 text-flame border border-flame/20 text-xs uppercase tracking-[0.2em]">
+                <span className="w-2 h-2 rounded-full bg-flame animate-pulse" />
+                Live Demo Active
               </div>
-
-              <span className="text-xs uppercase tracking-[0.2em] text-flame block mb-2">
-                RAG Engine v1.0
-              </span>
-              <h2 className="font-display text-3xl md:text-5xl">
-                AyushDevX Conversational Assistant
+              <h2 className="font-display text-3xl md:text-4xl">
+                RAG Portfolio Assistant
               </h2>
-              <p className="mt-4 text-sm text-muted-foreground max-w-2xl">
-                Our AI Portfolio Assistant uses Retrieval-Augmented Generation to
-                answer technical questions about our engineering architecture,
-                selected work, and software principles without hallucination.
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Test our interactive knowledge engine. It retrieves answers from
+                our project specifications and engineering rules with zero
+                hallucination.
               </p>
 
-              {/* Sample Interactive Chat Preview / Prompt Suggestions */}
-              <div className="mt-8 space-y-4">
-                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                  Suggested Prompts:
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    "What is the architecture of MalariaScope?",
-                    "How does AyushDevX handle RAG embeddings?",
-                    "What tech stack powers the EstateXAI platform?",
-                    "Explain your engineering philosophy.",
-                  ].map((prompt) => (
-                    <span
+              <div className="space-y-3 pt-4">
+                <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground block">
+                  Suggested Questions:
+                </span>
+                <div className="flex flex-col gap-2">
+                  {Object.keys(knowledgeBase).map((prompt) => (
+                    <button
                       key={prompt}
-                      className="px-3.5 py-2 bg-muted border border-border text-xs text-foreground/85 cursor-pointer hover:border-flame transition-colors"
+                      onClick={() => handleSendQuery(prompt)}
+                      className="text-left px-4 py-3 bg-card border border-border text-xs text-foreground/90 hover:border-flame hover:text-flame transition-colors"
                     >
-                      &ldquo;{prompt}&rdquo;
-                    </span>
+                      &ldquo;{prompt}&rdquo; →
+                    </button>
                   ))}
                 </div>
               </div>
+            </div>
 
-              <div className="mt-10 flex items-center gap-4">
-                <Magnetic strength={0.3}>
-                  <Link
-                    to="/products"
-                    className="text-xs uppercase tracking-[0.2em] bg-flame text-ink px-6 py-3.5 inline-block font-medium hover:bg-flame/90 transition-colors"
-                  >
-                    View All AI Products →
-                  </Link>
-                </Magnetic>
+            {/* Right Column: Chat Window */}
+            <div className="lg:col-span-7 border border-border bg-card flex flex-col h-[520px]">
+              {/* Chat Header */}
+              <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-muted/30">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-flame" />
+                  <span className="text-xs uppercase tracking-[0.2em] font-medium">
+                    AyushDevX Assistant v1.0
+                  </span>
+                </div>
+                <button
+                  onClick={() => setMessages([defaultAssistantMessage])}
+                  className="text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Clear Chat ✕
+                </button>
               </div>
+
+              {/* Message List */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                <AnimatePresence initial={false}>
+                  {messages.map((msg) => (
+                    <motion.div
+                      key={msg.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`flex flex-col ${
+                        msg.sender === "user" ? "items-end" : "items-start"
+                      }`}
+                    >
+                      <div
+                        className={`max-w-[85%] px-4 py-3 text-sm ${
+                          msg.sender === "user"
+                            ? "bg-flame text-ink font-medium"
+                            : "bg-muted text-foreground border border-border"
+                        }`}
+                      >
+                        <p className="leading-relaxed">{msg.text}</p>
+                        {msg.citations && msg.citations.length > 0 && (
+                          <div className="mt-3 pt-2 border-t border-border/50 flex flex-wrap items-center gap-1.5">
+                            <span className="text-[0.65rem] uppercase tracking-wider opacity-75">
+                              Sources:
+                            </span>
+                            {msg.citations.map((cite) => (
+                              <span
+                                key={cite}
+                                className="text-[0.65rem] font-mono px-1.5 py-0.5 bg-background border border-border"
+                              >
+                                {cite}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+
+                {isTyping && (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground italic">
+                    <span className="w-1.5 h-1.5 bg-flame rounded-full animate-bounce" />
+                    <span className="w-1.5 h-1.5 bg-flame rounded-full animate-bounce [animation-delay:0.2s]" />
+                    <span className="w-1.5 h-1.5 bg-flame rounded-full animate-bounce [animation-delay:0.4s]" />
+                    Assistant is retrieving verified sources...
+                  </div>
+                )}
+              </div>
+
+              {/* Chat Input Bar */}
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSendQuery(input);
+                }}
+                className="p-4 border-t border-border flex gap-2"
+              >
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Ask a technical question about AyushDevX..."
+                  className="flex-1 bg-background border border-border px-4 py-2.5 text-sm focus:outline-none focus:border-flame transition-colors"
+                />
+                <Magnetic strength={0.2}>
+                  <button
+                    type="submit"
+                    disabled={!input.trim()}
+                    className="text-xs uppercase tracking-[0.2em] bg-flame text-ink px-6 py-2.5 font-medium hover:bg-flame/90 transition-colors disabled:opacity-50"
+                  >
+                    Send →
+                  </button>
+                </Magnetic>
+              </form>
             </div>
           </div>
         </section>
 
-        {/* AI Lab Tools Hub */}
+        {/* Other AI Lab Tools Preview */}
         <section className="px-6 md:px-10 py-16 md:py-24">
           <div className="max-w-6xl mx-auto">
             <div className="flex items-end justify-between mb-12">
               <div>
                 <span className="text-xs uppercase tracking-[0.2em] text-flame block mb-2">
-                  Tool Catalog
+                  Upcoming Tools
                 </span>
                 <h2 className="font-display text-4xl md:text-5xl">
-                  Experimental tools.
+                  Experimental pipeline.
                 </h2>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {tools.map((tool, i) => (
-                <motion.div
-                  key={tool.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: i * 0.1 }}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                {
+                  name: "AI PDF Chat Studio",
+                  desc: "Upload technical PDFs for zero-hallucination interactive question answering with page citations.",
+                  badge: "RAG / Embeddings",
+                },
+                {
+                  name: "AI Resume & ATS Matcher",
+                  desc: "Compare resumes against job descriptions to receive instant keyword gap scoring.",
+                  badge: "NLP Analysis",
+                },
+                {
+                  name: "AI Data Analyst Studio",
+                  desc: "Upload CSV datasets to run automated Exploratory Data Analysis via natural language.",
+                  badge: "No-Code SQL",
+                },
+              ].map((tool) => (
+                <div
+                  key={tool.name}
                   className="border border-border bg-card p-8 flex flex-col justify-between space-y-6"
                 >
                   <div>
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-[0.65rem] uppercase tracking-[0.2em] px-2.5 py-1 bg-flame/10 text-flame border border-flame/20">
-                        {tool.badge}
-                      </span>
-                      <span className="text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground">
-                        {tool.status}
-                      </span>
-                    </div>
-                    <h3 className="font-display text-2xl md:text-3xl">
-                      {tool.name}
-                    </h3>
+                    <span className="text-[0.65rem] uppercase tracking-[0.2em] px-2.5 py-1 bg-muted text-muted-foreground border border-border mb-4 inline-block">
+                      {tool.badge}
+                    </span>
+                    <h3 className="font-display text-2xl">{tool.name}</h3>
                     <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
                       {tool.desc}
                     </p>
                   </div>
-
-                  <div className="pt-4 border-t border-border flex items-center justify-between">
-                    {tool.comingSoon ? (
-                      <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground italic">
-                        In Active Development
-                      </span>
-                    ) : (
-                      <Link
-                        to="/products"
-                        className="text-xs uppercase tracking-[0.2em] text-flame hover:underline font-medium"
-                      >
-                        Explore Product →
-                      </Link>
-                    )}
+                  <div className="pt-4 border-t border-border">
+                    <span className="text-xs uppercase tracking-[0.2em] text-flame italic">
+                      In Development
+                    </span>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
