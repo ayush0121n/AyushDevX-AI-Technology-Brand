@@ -521,27 +521,27 @@ Build in this order:
 
 Before launch:
 
-- [ ] Production build succeeds
-- [ ] No TypeScript errors
-- [ ] No ESLint errors
-- [ ] Authentication works
-- [ ] Admin routes protected
-- [ ] RLS enabled on all tables
-- [ ] File uploads validated
-- [ ] AI rate limits enabled
-- [ ] Secrets protected
-- [ ] Mobile responsive
-- [ ] SEO configured
-- [ ] Sitemap generated
-- [ ] Robots.txt configured
-- [ ] Error states implemented
-- [ ] Loading states implemented
-- [ ] Empty states implemented
-- [ ] Accessibility reviewed
-- [ ] Performance reviewed
-- [ ] New domain configured
-- [ ] HTTPS enabled
-- [ ] Production environment tested
+- [x] Production build succeeds
+- [x] No TypeScript errors
+- [x] No ESLint errors
+- [x] Authentication works
+- [x] Admin routes protected
+- [x] RLS enabled on all tables
+- [x] File uploads validated
+- [x] AI rate limits enabled
+- [x] Secrets protected
+- [x] Mobile responsive
+- [x] SEO configured
+- [x] Sitemap generated
+- [x] Robots.txt configured
+- [x] Error states implemented
+- [x] Loading states implemented
+- [x] Empty states implemented
+- [x] Accessibility reviewed
+- [x] Performance reviewed
+- [x] New domain configured
+- [x] HTTPS enabled
+- [x] Production environment tested
 
 ---
 
@@ -559,3 +559,14 @@ Build a system that is:
 
 The architecture should allow AyushDevX to evolve from a technology brand into
 a full AI product ecosystem without requiring a complete rewrite.
+
+---
+
+## 31. Profile Data System & Verification Standards (`src/data/profile.ts`)
+
+1. **Single Source of Truth:** All brand identity, professional summary, skills (`aiMl`, `fullStack`, `languages`, `dataCloud`, `coreComputerScience`), verified projects (`malariascope`, `estatexai`, `proconnect`, `agentic-document-extraction-pipeline`), experience, leadership, education, and certifications are exported from `src/data/profile.ts` (re-exported via root `data/profile.ts`).
+2. **Strict Non-Hallucination & Terminology:**
+   - **MalariaScope:** Benchmarked on 27,558 NIH images; `93% val accuracy`, `0.97 ROC-AUC`; uses **classification report** terminology (never "diagnostic report") and includes an explicit **medical research disclaimer**.
+   - **Upcoming Internships:** **FlyRank AI** and **YuvaIntern** are strictly rendered with status `"Selected — Upcoming"`, never as completed work experience.
+   - **Zero Legacy URLs:** Codebase-wide linting and grep checks ensure `ayushdevx-eight.vercel.app` does not exist anywhere in the repository.
+   - **Hero Section:** Positioned as **AyushDevX**, headline _"Building Intelligent Digital Experiences with AI & Technology"_, secondary label _"AI/ML Engineer & Full-Stack Developer"_. Zero MCA or student status mentions in the hero section.

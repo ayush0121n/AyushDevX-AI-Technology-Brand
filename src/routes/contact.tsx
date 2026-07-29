@@ -47,7 +47,9 @@ function ContactPage() {
 
       const { error } = await (
         supabase.from("contact_messages") as unknown as {
-          insert: (data: unknown[]) => Promise<{ error: { message: string } | null }>;
+          insert: (
+            data: unknown[],
+          ) => Promise<{ error: { message: string } | null }>;
         }
       ).insert([
         {

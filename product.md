@@ -370,3 +370,39 @@ AyushDevX should always prioritize:
 > Solve meaningful problems.
 >
 > Make AI accessible.
+
+---
+
+## 19. Featured Engineering Projects (Verified)
+
+All projects showcased on AyushDevX must represent real, production-quality software engineering and research with verified metrics and terminology:
+
+1. **MalariaScope (`malariascope`):**
+   - **Type:** AI-Powered Malaria Detection System (2025).
+   - **Dataset:** 27,558 NIH blood-smear images.
+   - **Model & Performance:** Benchmarked three CNN architectures; **EfficientNetB0** with transfer learning achieved **93% validation accuracy** and **0.97 ROC-AUC**, outperforming baseline architectures with inference time below 3 seconds.
+   - **Deployment:** Flask REST API with drag-and-drop web interface and automated **classification reports** (never referred to as "diagnostic reports" to avoid medical misinterpretation).
+   - **Medical Disclaimer:** Explicitly stated on all cards and detail pages: _"This project is for research and educational purposes and is not a substitute for professional medical diagnosis."_
+
+2. **EstateXAI (`estatexai`):**
+   - **Type:** AI-Driven Real Estate and PG Finder Platform (2025).
+   - **Architecture:** Full-stack MERN platform with Admin, Owner, and User roles, JWT authentication, MongoDB Atlas integration, geospatial listing filters, and AI-powered recommendation algorithms.
+
+3. **ProConnect (`proconnect`):**
+   - **Type:** Professional Networking and Collaboration Platform (2025).
+   - **Architecture:** React 19 + TypeScript frontend with 20+ Atomic Design components, Node.js/Express.js backend, JWT authentication, real-time Socket.IO messaging, and scalable MongoDB schemas (`https://github.com/ayush0121n/ai`).
+
+4. **Agentic Document-Extraction Pipeline (`agentic-document-extraction-pipeline`):**
+   - **Type:** Retrieval-Augmented Document Processing System (2026).
+   - **Architecture:** Python agentic RAG pipeline using `pdfplumber` for text parsing, ChromaDB for vector storage, and Claude API for structured extraction from PDF documents.
+
+---
+
+## 20. Verified Profile & Credentials Architecture
+
+All identity, skills, experience, leadership, education, and certification data is managed centrally via `src/data/profile.ts`:
+
+- **Hero & Identity:** Positioned as **AyushDevX**, headline _"Building Intelligent Digital Experiences with AI & Technology"_, secondary label _"AI/ML Engineer & Full-Stack Developer"_. Zero MCA or student status mentions in the hero section.
+- **Experience Fellowships:** Both **FlyRank AI** (Machine Learning Engineering Intern, Jul–Sep 2026) and **YuvaIntern** (AI Research Intern, Apr–Jun 2026) are strictly marked as `"Selected — Upcoming"` and never presented as completed work experience.
+- **Academic Profile:** Displayed in a secondary section on the About page (`MCA CGPA 8.58/10.0`, `BCA CGPA 7.38/10.0`).
+- **Verified Certifications:** Lists all 11 verified credentials from Oracle Cloud Infrastructure (2025 AI Foundations & Data Science Professional), IBM SkillsBuild, nasscom FutureSkills Prime, HackerRank, HP LIFE, Simplilearn, Infosys, and UNICEF YuWaah.

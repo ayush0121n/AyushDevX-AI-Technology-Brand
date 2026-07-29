@@ -438,3 +438,15 @@ The final result should feel like:
 Not:
 
 > A student portfolio website.
+
+---
+
+## 20. VERIFIED PROFILE & PROJECT STANDARDS
+
+All AI coding agents working on AyushDevX must adhere to the following rules regarding profile and project content:
+
+1. **Central Profile Source:** All personal, brand, skill, project, experience, leadership, and certification data must be imported from `@/data/profile` (`src/data/profile.ts`). Never hardcode duplicate or contradictory profile information in UI components.
+2. **Hero Identity:** The hero section must position **AyushDevX** as the primary brand, headline _"Building Intelligent Digital Experiences with AI & Technology"_, and secondary label _"AI/ML Engineer & Full-Stack Developer"_. Do not mention MCA or student status in the hero.
+3. **Medical & Research Disclaimers:** Any reference to **MalariaScope** (`malariascope`) must use **"classification report"** terminology (never "diagnostic report") and display the explicit medical research disclaimer: _"This project is for research and educational purposes and is not a substitute for professional medical diagnosis."_
+4. **Future Internships:** Future or upcoming fellowships (**FlyRank AI**, **YuvaIntern**) must be displayed with status `"Selected — Upcoming"` and never presented as completed work experience.
+5. **No Legacy Domain Mention:** Never use or link to `ayushdevx-eight.vercel.app`. Always use `VITE_SITE_URL` or verified GitHub URLs from `src/data/profile.ts`.

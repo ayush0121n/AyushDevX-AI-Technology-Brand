@@ -34,8 +34,7 @@ function ProjectsPage() {
 
   const filteredProjects = profile.projects.filter((project) => {
     if (activeFilter === "All") return true;
-    if (activeFilter === "Open-Source")
-      return Boolean(project.githubUrl);
+    if (activeFilter === "Open-Source") return Boolean(project.githubUrl);
     return project.category === activeFilter;
   });
 

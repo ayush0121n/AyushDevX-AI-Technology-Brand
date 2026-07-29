@@ -139,6 +139,17 @@ AYUSHDEVX
 
 ---
 
+## Selected Engineering Projects (Verified)
+
+| Project                       | Category   | Key Tech & Metrics                                            | Description & Disclaimer                                                                                                                                                                    |
+| :---------------------------- | :--------- | :------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **MalariaScope**              | AI / ML    | `93% Val Accuracy`, `0.97 ROC-AUC`, EfficientNetB0, Flask API | Deep learning vision system for analyzing 27,558 NIH blood-smear images with automated **classification reports**. _(Research & educational use only; not a medical diagnosis substitute.)_ |
+| **EstateXAI**                 | Full-Stack | MERN, JWT Auth, MongoDB Atlas, Geospatial Filters             | Real estate & PG discovery platform with role-based access control and AI-based listing recommendations.                                                                                    |
+| **ProConnect**                | Full-Stack | React 19, TypeScript, Socket.IO, Express.js                   | Professional networking platform with real-time Socket.IO messaging and 20+ Atomic Design components (`github.com/ayush0121n/ai`).                                                          |
+| **Agentic Document Pipeline** | AI / ML    | Python, ChromaDB, `pdfplumber`, Claude API                    | Take-home agentic RAG pipeline for structured document ingestion and retrieval-augmented extraction.                                                                                        |
+
+---
+
 ## AI Lab Tools
 
 | Tool                   | Description                                      |
