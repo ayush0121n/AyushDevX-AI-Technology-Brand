@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://your-new-domain.com/sitemap.xml
