@@ -57,7 +57,7 @@ export function Hero() {
 
       <motion.div style={{ y, opacity }} className="relative z-10">
         <div className="font-display text-[clamp(3.5rem,16vw,18rem)] leading-[0.82] space-y-6">
-          {["AI ENGINEER.", "FULL-STACK", "DEVELOPER", "BY CRAFT."].map(
+          {["BUILDING", "INTELLIGENT", "DIGITAL", "EXPERIENCES."].map(
             (line, i) => (
               <div key={i} className="overflow-hidden">
                 <motion.div
@@ -81,9 +81,9 @@ export function Hero() {
             transition={{ delay: 0.9, duration: 0.8 }}
             className="max-w-md text-sm md:text-base text-muted-foreground"
           >
-            I'm Ayush Narkhede — Oracle-certified AI/ML Engineer and MCA
-            candidate (8.58 CGPA) building production-grade deep learning
-            systems and full-stack MERN applications.
+            AyushDevX — an AI & technology brand building intelligent
+            applications, AI-powered tools, and digital products with
+            open-source AI and modern full-stack engineering.
           </motion.p>
 
           <motion.div
@@ -99,9 +99,9 @@ export function Hero() {
 
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-10 bottom-24 font-display text-[24vw] text-flame/10 select-none"
+        className="pointer-events-none absolute -right-10 bottom-24 font-display text-[18vw] text-flame/10 select-none"
       >
-        AYUSH
+        AYUSHDEVX
       </div>
     </section>
   );

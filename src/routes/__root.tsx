@@ -76,21 +76,26 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       meta: [
         { charSet: "utf-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },
-        { title: "Ayush Narkhede | Portfolio" },
+        { title: "AyushDevX — AI & Technology Brand" },
         {
           name: "description",
           content:
-            "Ayush Narkhede - AI/ML Engineer & Full-Stack Developer Portfolio",
+            "AyushDevX is a professional AI and technology brand building intelligent applications, AI-powered tools, and digital products.",
         },
-        { name: "author", content: "Ayush Narkhede" },
-        { property: "og:title", content: "Ayush Narkhede | Portfolio" },
+        { name: "author", content: "AyushDevX" },
+        { property: "og:title", content: "AyushDevX — AI & Technology Brand" },
         {
           property: "og:description",
           content:
-            "Ayush Narkhede - AI/ML Engineer & Full-Stack Developer Portfolio",
+            "Building Intelligent Digital Experiences with AI & Technology.",
         },
         { property: "og:type", content: "website" },
-        { name: "twitter:card", content: "summary" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: "AyushDevX — AI & Technology Brand" },
+        {
+          name: "twitter:description",
+          content: "Building Intelligent Digital Experiences with AI & Technology.",
+        },
       ],
       links: [
         {

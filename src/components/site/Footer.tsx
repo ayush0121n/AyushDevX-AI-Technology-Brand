@@ -9,17 +9,22 @@ export function Footer() {
     >
       <div className="overflow-hidden py-10 border-b border-ink/20">
         <Marquee
-          items={["Let's build something", "Available for hire", "Say hello"]}
+          items={[
+            "Building Intelligent Digital Experiences",
+            "AI & Technology Brand",
+            "Let's build something together",
+          ]}
         />
       </div>
       <div className="relative px-6 md:px-10 py-20 grid grid-cols-1 md:grid-cols-3 gap-12">
         <div>
-          <div className="font-display text-5xl">
-            AYUSH<sup className="text-base align-super">®</sup>
+          <div className="font-display text-5xl inline-flex items-baseline gap-0.5">
+            AYUSHDEV<span className="opacity-80">X</span>
+            <sup className="text-base align-super opacity-50">®</sup>
           </div>
           <p className="mt-4 text-sm max-w-xs">
-            Ayush Gajanan Narkhede — AI/ML Engineer, Full-Stack Developer based
-            in Pune, India.
+            Building intelligent applications, AI-powered tools, and digital
+            products. AI product studio & technology brand.
           </p>
         </div>
         <div>
@@ -34,7 +39,7 @@ export function Footer() {
 
           <div className="mt-8">
             <h4 className="text-xs uppercase tracking-[0.25em] mb-4">
-              Elsewhere
+              Connect
             </h4>
             <ul className="space-y-2 text-lg">
               <li>
@@ -58,13 +63,8 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <a
-                  href="https://ayushdevx.onrender.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hover:underline"
-                >
-                  Portfolio ↗
+                <a href="/ai-lab" className="hover:underline">
+                  AI Lab ↗
                 </a>
               </li>
             </ul>
@@ -81,8 +81,8 @@ export function Footer() {
         </div>
       </div>
       <div className="px-6 md:px-10 py-6 border-t border-ink/20 flex flex-col md:flex-row items-center justify-between text-xs uppercase tracking-[0.2em] gap-2">
-        <span>© {new Date().getFullYear()} Ayush Narkhede</span>
-        <span>Built with intention. Shipped with care.</span>
+        <span>© {new Date().getFullYear()} AyushDevX. All rights reserved.</span>
+        <span>Building Intelligent Digital Experiences with AI & Technology.</span>
       </div>
     </footer>
   );

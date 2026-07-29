@@ -27,15 +27,15 @@ function Counter({
 }
 
 const stats = [
-  { v: 8.58, s: "", d: 2, label: "CGPA in MCA (AI), Sri Balaji University" },
   { v: 93, s: "%", d: 0, label: "Validation accuracy on MalariaScope CNN" },
   {
     v: 10,
     s: "+",
     d: 0,
-    label: "Industry certifications (Oracle, IBM, Deloitte)",
+    label: "Industry certifications (Oracle, IBM, Deloitte, nasscom)",
   },
-  { v: 2000, s: "+", d: 0, label: "Students led as Council President" },
+  { v: 7, s: "+", d: 0, label: "AI Lab tools planned across the platform" },
+  { v: 2, s: "+", d: 0, label: "Verified software projects in production" },
 ];
 
 export function Stats() {
@@ -44,7 +44,7 @@ export function Stats() {
       <div className="flex items-end justify-between mb-16">
         <h2 className="font-display text-[clamp(3rem,8vw,9rem)]">
           Numbers <br />
-          <span className="text-flame italic">that ship.</span>
+          <span className="text-flame italic">that matter.</span>
         </h2>
         <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
           (Why me)

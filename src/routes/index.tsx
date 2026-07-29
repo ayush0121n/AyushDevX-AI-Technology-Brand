@@ -15,11 +15,11 @@ export const Route = createFileRoute("/")({
   component: Index,
   head: () => ({
     meta: [
-      { title: "Ayush Narkhede — AI/ML Engineer & Full-Stack Developer" },
+      { title: "AyushDevX — Building Intelligent Digital Experiences" },
       {
         name: "description",
         content:
-          "Oracle-certified AI/ML Engineer and MCA (AI) candidate building deep learning systems and MERN applications.",
+          "AyushDevX is an AI & technology brand building intelligent applications, AI-powered tools, and digital products with open-source AI and full-stack engineering.",
       },
     ],
   }),

@@ -16,7 +16,7 @@ export function About() {
   const rotate = useTransform(scrollYProgress, [0, 1], [-8, 8]);
 
   const words =
-    "I build production deep learning systems and full-stack MERN applications — engineered for accuracy, speed, and scale.".split(
+    "We build intelligent applications, AI-powered tools, and digital products — engineered for accuracy, scale, and real-world impact.".split(
       " ",
     );
 
@@ -44,7 +44,7 @@ export function About() {
             transition={{ duration: 0.5, delay: i * 0.04 }}
             className="inline-block mr-[0.25em]"
           >
-            {w === "accuracy," || w === "scale." ? (
+            {w === "accuracy," || w === "impact." ? (
               <span className="text-flame italic">{w}</span>
             ) : (
               w
