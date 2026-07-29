@@ -791,9 +791,7 @@ function AILabPage() {
                       <button
                         onClick={handleAnalyzeAts}
                         disabled={
-                          isAnalyzing ||
-                          !resumeText.trim() ||
-                          !jobText.trim()
+                          isAnalyzing || !resumeText.trim() || !jobText.trim()
                         }
                         className="w-full py-3.5 bg-flame text-ink text-xs uppercase tracking-[0.2em] font-medium hover:bg-flame/90 transition-colors disabled:opacity-50"
                       >
@@ -819,8 +817,8 @@ function AILabPage() {
                       </h4>
                       <p className="text-sm text-muted-foreground mt-1 max-w-sm">
                         Enter your resume skills and target job description on
-                        the left, or click &ldquo;Load Sample Profile&rdquo; to test
-                        the analyzer.
+                        the left, or click &ldquo;Load Sample Profile&rdquo; to
+                        test the analyzer.
                       </p>
                     </div>
                   </div>
@@ -877,8 +875,7 @@ function AILabPage() {
                     {/* Missing Keywords */}
                     <div>
                       <h4 className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-2">
-                        ✕ Keyword Gaps to Address (
-                        {atsResult.missing.length})
+                        ✕ Keyword Gaps to Address ({atsResult.missing.length})
                       </h4>
                       <div className="flex flex-wrap gap-1.5">
                         {atsResult.missing.map((kw) => (

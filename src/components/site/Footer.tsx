@@ -81,8 +81,12 @@ export function Footer() {
         </div>
       </div>
       <div className="px-6 md:px-10 py-6 border-t border-ink/20 flex flex-col md:flex-row items-center justify-between text-xs uppercase tracking-[0.2em] gap-2">
-        <span>© {new Date().getFullYear()} AyushDevX. All rights reserved.</span>
-        <span>Building Intelligent Digital Experiences with AI & Technology.</span>
+        <span>
+          © {new Date().getFullYear()} AyushDevX. All rights reserved.
+        </span>
+        <span>
+          Building Intelligent Digital Experiences with AI & Technology.
+        </span>
       </div>
     </footer>
   );

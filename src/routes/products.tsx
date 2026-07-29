@@ -130,9 +130,7 @@ function ProductsPage() {
   );
 
   const filteredProducts =
-    filter === "all"
-      ? products
-      : products.filter((p) => p.status === filter);
+    filter === "all" ? products : products.filter((p) => p.status === filter);
 
   return (
     <main className="bg-background text-foreground min-h-screen flex flex-col justify-between">

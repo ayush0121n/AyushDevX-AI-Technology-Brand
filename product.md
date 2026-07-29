@@ -43,9 +43,11 @@ AyushDevX is a professional technology brand focused on building intelligent
 applications, AI-powered tools, software products, and digital experiences.
 
 **Primary tagline:**
+
 > Building Intelligent Digital Experiences with AI & Technology.
 
 **Alternative tagline:**
+
 > Where AI Meets Innovation.
 
 ---
@@ -53,6 +55,7 @@ applications, AI-powered tools, software products, and digital experiences.
 ## 5. Target Audience
 
 **Primary:**
+
 - Recruiters
 - Hiring managers
 - Technology companies
@@ -63,6 +66,7 @@ applications, AI-powered tools, software products, and digital experiences.
 - Technical collaborators
 
 **Secondary:**
+
 - Students
 - Researchers
 - Developers
@@ -73,6 +77,7 @@ applications, AI-powered tools, software products, and digital experiences.
 ## 6. Core Website
 
 **Main navigation:**
+
 - Home
 - AI Lab
 - Products
@@ -103,6 +108,7 @@ Building Intelligent Digital Experiences with AI & Technology.
 ```
 
 **CTAs:**
+
 - Explore AI Lab
 - View Products
 - Explore Work
@@ -115,24 +121,31 @@ Building Intelligent Digital Experiences with AI & Technology.
 The AI Lab is the core technology showcase.
 
 ### AI Portfolio Assistant
+
 A RAG-powered assistant that understands AyushDevX content.
 
 ### AI PDF Chat
+
 Upload documents and ask questions.
 
 ### AI Resume Analyzer
+
 Analyze resumes against job descriptions.
 
 ### AI Data Analyst
+
 Upload datasets and ask questions using natural language.
 
 ### AI Code Reviewer
+
 Analyze and improve code.
 
 ### AI Interview Simulator
+
 Practice technical and HR interviews.
 
 ### AI Study Assistant
+
 Generate learning plans, quizzes, notes, and flashcards.
 
 ---
@@ -148,6 +161,7 @@ Products should look like real software products.
 Analyze documents using AI.
 
 **Features:**
+
 - Upload documents
 - Ask questions
 - Retrieve information
@@ -161,6 +175,7 @@ Analyze documents using AI.
 Interact with datasets using natural language.
 
 **Features:**
+
 - CSV upload
 - Data profiling
 - Visualization
@@ -174,6 +189,7 @@ Interact with datasets using natural language.
 Analyze resume and job compatibility.
 
 **Features:**
+
 - ATS score
 - Skill matching
 - Keyword analysis
@@ -186,6 +202,7 @@ Analyze resume and job compatibility.
 Projects should be presented as professional case studies.
 
 **Each project includes:**
+
 - Problem
 - Solution
 - Features
@@ -197,6 +214,7 @@ Projects should be presented as professional case studies.
 - Future improvements
 
 **Verified projects may include:**
+
 - EstateXAI
 - Malaria Detection
 - Other verified software projects
@@ -209,6 +227,7 @@ Projects should be presented as professional case studies.
 Provide a structured resource library.
 
 **Categories:**
+
 - AI
 - Machine Learning
 - Deep Learning
@@ -224,6 +243,7 @@ Provide a structured resource library.
 - Interview Preparation
 
 **Resources:**
+
 - PDFs
 - Notes
 - Tutorials
@@ -232,6 +252,7 @@ Provide a structured resource library.
 - Interview preparation
 
 **Features:**
+
 - Search
 - Filter
 - Tags
@@ -243,6 +264,7 @@ Provide a structured resource library.
 ## 12. Admin Dashboard
 
 **Admin features:**
+
 - Authentication
 - Resource management
 - PDF uploads
@@ -260,6 +282,7 @@ Only authorized administrators may modify content.
 Technical publication platform.
 
 **Topics:**
+
 - AI
 - ML
 - RAG
@@ -273,6 +296,7 @@ Technical publication platform.
 ## 14. AI Portfolio Assistant
 
 The assistant should know:
+
 - AyushDevX
 - Projects
 - Products
@@ -283,6 +307,7 @@ The assistant should know:
 It should never hallucinate.
 
 If information is unavailable:
+
 > I don't have verified information about that.
 
 ---
@@ -290,12 +315,14 @@ If information is unavailable:
 ## 15. Contact
 
 Allow visitors to:
+
 - Send messages
 - Email
 - Connect through LinkedIn
 - Visit GitHub
 
 **CTA:**
+
 > Have an idea or opportunity? Let's build something together.
 
 ---
@@ -303,6 +330,7 @@ Allow visitors to:
 ## 16. Business Evolution
 
 The platform should be architected so it can eventually support:
+
 - SaaS products
 - AI tools
 - Developer tools
@@ -320,6 +348,7 @@ unless explicitly verified.
 Do not use fake statistics.
 
 **Optional analytics:**
+
 - Page views
 - Project views
 - AI tool usage

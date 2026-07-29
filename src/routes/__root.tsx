@@ -94,7 +94,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         { name: "twitter:title", content: "AyushDevX — AI & Technology Brand" },
         {
           name: "twitter:description",
-          content: "Building Intelligent Digital Experiences with AI & Technology.",
+          content:
+            "Building Intelligent Digital Experiences with AI & Technology.",
         },
       ],
       links: [

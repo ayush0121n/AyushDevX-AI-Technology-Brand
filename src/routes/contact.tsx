@@ -1,16 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { Magnetic } from "@/components/site/Magnetic";
 import { supabase } from "@/lib/supabase";
+import { profile } from "@/data/profile";
 
 export const Route = createFileRoute("/contact")({
   component: ContactPage,
   head: () => ({
     meta: [
-      { title: "AyushDevX — Contact & Connect" },
+      { title: `${profile.brandName} — Contact & Connect` },
       {
         name: "description",
         content:
@@ -39,14 +39,17 @@ function ContactPage() {
 
     try {
       if (!supabase) {
-        // Fallback simulation if Supabase is not yet configured locally
         await new Promise((resolve) => setTimeout(resolve, 1000));
         setStatus("success");
         setFormData({ name: "", email: "", subject: "", message: "" });
         return;
       }
 
-      const { error } = await supabase.from("contact_messages").insert([
+      const { error } = await (
+        supabase.from("contact_messages") as unknown as {
+          insert: (data: unknown[]) => Promise<{ error: { message: string } | null }>;
+        }
+      ).insert([
         {
           name: formData.name,
           email: formData.email,
@@ -62,9 +65,8 @@ function ContactPage() {
 
       setStatus("success");
       setFormData({ name: "", email: "", subject: "", message: "" });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error submitting contact message:", err);
-      // Even if RLS or table isn't set up yet, show user-friendly fallback
       setStatus("success");
       setFormData({ name: "", email: "", subject: "", message: "" });
     }
@@ -79,7 +81,7 @@ function ContactPage() {
         <section className="pt-36 pb-16 px-6 md:px-10 border-b border-border">
           <div className="max-w-6xl">
             <span className="text-xs uppercase tracking-[0.25em] text-flame block mb-4">
-              (04 / Contact AyushDevX)
+              (04 / Contact {profile.brandName})
             </span>
             <h1 className="font-display text-[clamp(2.8rem,7vw,7.5rem)] leading-[0.9] tracking-tight">
               Let&apos;s build <br />
@@ -87,7 +89,7 @@ function ContactPage() {
             </h1>
             <p className="mt-6 text-sm md:text-base text-muted-foreground max-w-2xl">
               Have an opportunity, product idea, or AI engineering inquiry?
-              Connect with AyushDevX directly below.
+              Connect with {profile.brandName} directly below.
             </p>
           </div>
         </section>
@@ -105,19 +107,31 @@ function ContactPage() {
                   Open for collaboration.
                 </h3>
                 <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-                  We welcome conversations around intelligent digital experiences,
-                  open-source AI tools, full-stack software development, and
-                  technical partnerships.
+                  We welcome conversations around intelligent digital
+                  experiences, open-source AI tools, full-stack software
+                  development, and technical partnerships.
                 </p>
               </div>
 
               <div className="space-y-6 pt-6 border-t border-border">
                 <div>
                   <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground block mb-1">
+                    Email
+                  </span>
+                  <a
+                    href={`mailto:${profile.contact.email}`}
+                    className="text-sm font-medium hover:text-flame transition-colors"
+                  >
+                    {profile.contact.email}
+                  </a>
+                </div>
+
+                <div>
+                  <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground block mb-1">
                     GitHub
                   </span>
                   <a
-                    href="https://github.com/ayush0121n"
+                    href={profile.contact.github}
                     target="_blank"
                     rel="noreferrer"
                     className="text-sm font-medium hover:text-flame transition-colors"
@@ -131,12 +145,12 @@ function ContactPage() {
                     LinkedIn
                   </span>
                   <a
-                    href="https://linkedin.com/in/ayush0121n"
+                    href={profile.contact.linkedin}
                     target="_blank"
                     rel="noreferrer"
                     className="text-sm font-medium hover:text-flame transition-colors"
                   >
-                    linkedin.com/in/ayush0121n ↗
+                    linkedin.com/in/ayush-narkhede ↗
                   </a>
                 </div>
 
@@ -145,7 +159,7 @@ function ContactPage() {
                     Location
                   </span>
                   <p className="text-sm text-foreground/90">
-                    Pune, Maharashtra, India · Remote Worldwide
+                    {profile.contact.location}
                   </p>
                 </div>
               </div>
@@ -235,7 +249,6 @@ function ContactPage() {
                   />
                 </div>
 
-                {/* Form Status Messages */}
                 {status === "success" && (
                   <div className="p-4 bg-flame/10 border border-flame text-flame text-sm">
                     ✓ Message received — thank you! We will get back to you

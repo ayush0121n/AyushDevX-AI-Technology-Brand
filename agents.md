@@ -36,6 +36,7 @@ AI & Technology
 AI Product Studio / Technology Brand
 
 **Core Areas:**
+
 - Artificial Intelligence
 - Machine Learning
 - Generative AI
@@ -48,6 +49,7 @@ AI Product Studio / Technology Brand
 - Digital Products
 
 **Primary Brand Message:**
+
 > Building Intelligent Digital Experiences with AI & Technology.
 
 ---
@@ -55,6 +57,7 @@ AI Product Studio / Technology Brand
 ## 3. IMPORTANT BRAND RULES
 
 Never position AyushDevX as:
+
 - A student portfolio
 - A college project
 - An academic website
@@ -151,6 +154,7 @@ Never make large uncontrolled changes.
 Build features incrementally.
 
 **Phase 1:**
+
 - Brand foundation
 - Design system
 - Homepage
@@ -158,12 +162,14 @@ Build features incrementally.
 - Footer
 
 **Phase 2:**
+
 - Projects
 - Products
 - About
 - Contact
 
 **Phase 3:**
+
 - Knowledge Hub
 - PDF storage
 - Search
@@ -171,21 +177,26 @@ Build features incrementally.
 - Admin Dashboard
 
 **Phase 4:**
+
 - AI Portfolio Assistant
 - AI Lab
 
 **Phase 5:**
+
 - AI PDF Chat / RAG
 
 **Phase 6:**
+
 - AI Resume Analyzer
 - AI Data Analyst
 
 **Phase 7:**
+
 - AI Code Reviewer
 - AI Interview Simulator
 
 **Phase 8:**
+
 - SEO
 - Performance
 - Security
@@ -202,6 +213,7 @@ requirement.
 Do not depend on expensive paid APIs.
 
 Prioritize:
+
 1. Open-source models
 2. Hugging Face
 3. Local inference
@@ -209,6 +221,7 @@ Prioritize:
 5. Free-tier services
 
 AI features must include:
+
 - Rate limiting
 - Request limits
 - Token limits
@@ -217,6 +230,7 @@ AI features must include:
 - Error handling
 
 If an AI service becomes unavailable:
+
 - Show a friendly error.
 - Do not crash the website.
 - Keep the rest of the platform functional.
@@ -256,12 +270,14 @@ Use typed database access wherever possible.
 All uploads must be validated.
 
 Validate:
+
 - MIME type
 - File extension
 - File size
 - Filename
 
 Allowed file types may include:
+
 - PDF
 - PNG
 - JPG
@@ -277,12 +293,14 @@ Use secure storage paths.
 ## 12. SECURITY
 
 Never expose:
+
 - Database passwords
 - Service role keys
 - AI API keys
 - Admin credentials
 
 Never commit:
+
 - `.env`
 - `.env.local`
 - Secret files
@@ -294,6 +312,7 @@ Use `.env.example` for documentation.
 ## 13. ERROR HANDLING
 
 Every feature must have:
+
 - Loading state
 - Empty state
 - Error state
@@ -310,6 +329,7 @@ Log technical errors securely.
 ## 14. UI/UX
 
 The interface must be:
+
 - Premium
 - Minimal
 - Modern
@@ -319,6 +339,7 @@ The interface must be:
 - Fast
 
 Avoid:
+
 - Excessive animations
 - Flashy effects
 - Generic AI templates
@@ -330,6 +351,7 @@ Avoid:
 ## 15. MOBILE
 
 Always test:
+
 - Mobile
 - Tablet
 - Laptop
@@ -344,12 +366,14 @@ All interactions must work on touch screens.
 ## 16. SEO
 
 Every public page must have:
+
 - Title
 - Description
 - Open Graph metadata
 - Canonical URL
 
 Also implement:
+
 - Sitemap
 - Robots.txt
 - Structured data where appropriate
@@ -395,17 +419,22 @@ Do not introduce paid services without explicit approval.
 Build AyushDevX as if it were a real technology product.
 
 Every page should answer:
+
 > Why does this exist?
 
 Every feature should answer:
+
 > What problem does this solve?
 
 Every AI tool should answer:
+
 > What value does this provide?
 
 The final result should feel like:
+
 > A professional AI technology brand building intelligent products and digital
 > experiences.
 
 Not:
+
 > A student portfolio website.

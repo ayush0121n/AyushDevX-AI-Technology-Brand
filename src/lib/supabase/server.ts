@@ -1,5 +1,5 @@
-import { createClient } from '@supabase/supabase-js'
-import type { Database } from './types'
+import { createClient } from "@supabase/supabase-js";
+import type { Database } from "./types";
 
 /**
  * Server-side Supabase admin client using the service role key.
@@ -8,13 +8,13 @@ import type { Database } from './types'
  *    server functions only. The service role key bypasses RLS.
  */
 export function createAdminClient() {
-  const supabaseUrl = process.env.VITE_SUPABASE_URL
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  const supabaseUrl = process.env.VITE_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !serviceRoleKey) {
     throw new Error(
-      'Missing server-side Supabase env vars: VITE_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required.'
-    )
+      "Missing server-side Supabase env vars: VITE_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required.",
+    );
   }
 
   return createClient<Database>(supabaseUrl, serviceRoleKey, {
@@ -22,7 +22,7 @@ export function createAdminClient() {
       autoRefreshToken: false,
       persistSession: false,
     },
-  })
+  });
 }
 
 /**
@@ -31,13 +31,13 @@ export function createAdminClient() {
  * Pass the user's JWT as the Authorization header to identify the user.
  */
 export function createServerClient(accessToken?: string) {
-  const supabaseUrl = process.env.VITE_SUPABASE_URL
-  const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY
+  const supabaseUrl = process.env.VITE_SUPABASE_URL;
+  const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error(
-      'Missing server-side Supabase env vars: VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are required.'
-    )
+      "Missing server-side Supabase env vars: VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are required.",
+    );
   }
 
   return createClient<Database>(supabaseUrl, supabaseAnonKey, {
@@ -52,5 +52,5 @@ export function createServerClient(accessToken?: string) {
           },
         }
       : undefined,
-  })
+  });
 }

@@ -9,6 +9,7 @@
 The AyushDevX interface should feel like a premium AI technology company.
 
 **Visual characteristics:**
+
 - Futuristic
 - Minimal
 - Professional
@@ -18,6 +19,7 @@ The AyushDevX interface should feel like a premium AI technology company.
 - Clean
 
 The design should be suitable for:
+
 - Recruiters
 - Developers
 - Founders
@@ -29,6 +31,7 @@ The design should be suitable for:
 ## 2. Brand Personality
 
 The visual identity should communicate:
+
 - Intelligence
 - Innovation
 - Engineering
@@ -51,6 +54,7 @@ Use gradients sparingly.
 Do not use too many colors.
 
 The accent color should be consistent throughout:
+
 - Buttons
 - Links
 - Active navigation
@@ -67,13 +71,13 @@ Use a modern sans-serif font.
 
 **Typography hierarchy:**
 
-| Level | Usage                          |
-|-------|--------------------------------|
-| H1    | Large, bold, highly readable   |
-| H2    | Strong section headings        |
-| H3    | Card and feature titles        |
-| Body  | Comfortable reading size       |
-| Small | Metadata and supporting info   |
+| Level | Usage                        |
+| ----- | ---------------------------- |
+| H1    | Large, bold, highly readable |
+| H2    | Strong section headings      |
+| H3    | Card and feature titles      |
+| Body  | Comfortable reading size     |
+| Small | Metadata and supporting info |
 
 Avoid excessive font sizes.
 
@@ -99,6 +103,7 @@ Navigation should remain accessible.
 Hero should be visually strong.
 
 **Structure:**
+
 1. Brand label
 2. Large headline
 3. Supporting description
@@ -107,6 +112,7 @@ Hero should be visually strong.
 6. Visual AI element
 
 **Suggested visual:**
+
 - Abstract AI network
 - Data visualization
 - Digital intelligence graphic
@@ -120,6 +126,7 @@ Do not use generic stock photos.
 The AI Lab should feel like a real application dashboard.
 
 **Use:**
+
 - Tool cards
 - Status indicators
 - AI icons
@@ -128,6 +135,7 @@ The AI Lab should feel like a real application dashboard.
 - Results panels
 
 **Each AI tool should have:**
+
 ```
 Header
 Description
@@ -148,11 +156,13 @@ Actions
 ```
 
 **Message actions:**
+
 - Copy
 - Regenerate
 - Clear
 
 **For RAG — show:**
+
 - Source
 - Page
 - Document
@@ -164,6 +174,7 @@ Use expandable source citations.
 ## 9. Knowledge Hub
 
 **Layout:**
+
 ```
 [Search Bar]
 [Category Filters]
@@ -171,6 +182,7 @@ Use expandable source citations.
 ```
 
 **Resource card:**
+
 - Thumbnail
 - Title
 - Description
@@ -185,6 +197,7 @@ Use expandable source citations.
 ## 10. Project Cards
 
 **Each project card:**
+
 - Project image
 - Project title
 - Short description
@@ -204,6 +217,7 @@ Keep animations subtle.
 Product cards should look more polished than project cards.
 
 **Include:**
+
 - Product icon
 - Product name
 - Short description
@@ -215,6 +229,7 @@ Product cards should look more polished than project cards.
 ## 12. Blog / Insights UI
 
 **Article card:**
+
 - Image
 - Category
 - Title
@@ -224,6 +239,7 @@ Product cards should look more polished than project cards.
 - Read Article link
 
 **Article page:**
+
 - Large title
 - Author
 - Date
@@ -239,6 +255,7 @@ Product cards should look more polished than project cards.
 The admin interface should prioritize functionality.
 
 **Sidebar:**
+
 ```
 Dashboard
 Resources
@@ -250,6 +267,7 @@ Settings
 ```
 
 **Main area:**
+
 - Statistics
 - Recent activity
 - Quick actions
@@ -259,6 +277,7 @@ Settings
 ## 14. Animations
 
 **Use subtle animations:**
+
 - Fade
 - Slide
 - Scale
@@ -266,6 +285,7 @@ Settings
 - Page transitions
 
 **Avoid:**
+
 - Excessive particles
 - Constant motion
 - Distracting 3D
@@ -280,6 +300,7 @@ Respect `prefers-reduced-motion`.
 ## 15. Responsive Design
 
 **Breakpoints:**
+
 - Mobile
 - Tablet
 - Desktop
@@ -294,6 +315,7 @@ Test every major page on mobile.
 ## 16. Accessibility
 
 Ensure:
+
 - Keyboard navigation
 - Visible focus states
 - Proper contrast ratios
@@ -308,6 +330,7 @@ Ensure:
 Every empty section should have a meaningful message.
 
 **Example:**
+
 > No resources found.
 
 Add a useful action where possible.
@@ -319,6 +342,7 @@ Add a useful action where possible.
 Errors should be clear and human-readable.
 
 **Example:**
+
 > Something went wrong while loading this resource. Please try again.
 
 Never show technical stack traces.
@@ -328,6 +352,7 @@ Never show technical stack traces.
 ## 19. Loading States
 
 **Use:**
+
 - Skeleton loaders
 - Progress indicators
 - Spinners where appropriate
@@ -335,6 +360,7 @@ Never show technical stack traces.
 AI tools should display meaningful processing messages.
 
 **Example:**
+
 > Analyzing your document...
 
 ---

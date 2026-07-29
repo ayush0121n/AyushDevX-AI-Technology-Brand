@@ -76,7 +76,9 @@ export function Nav() {
               className="block h-px w-full bg-current origin-center"
             />
             <motion.span
-              animate={open ? { opacity: 0, scaleX: 0 } : { opacity: 1, scaleX: 1 }}
+              animate={
+                open ? { opacity: 0, scaleX: 0 } : { opacity: 1, scaleX: 1 }
+              }
               className="block h-px w-full bg-current"
             />
             <motion.span

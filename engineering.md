@@ -7,6 +7,7 @@
 ## 1. Architecture
 
 **Frontend:**
+
 - TanStack Start (React 19 + Vite)
 - TanStack Router (file-system routing)
 - TypeScript
@@ -14,25 +15,32 @@
 - Framer Motion
 
 **Backend:**
+
 - TanStack Start Server Functions (SSR & API)
 - TanStack Start API Route Handlers
 
 **Database:**
+
 - Supabase PostgreSQL
 
 **Authentication:**
+
 - Supabase Auth
 
 **Storage:**
+
 - Supabase Storage
 
 **AI:**
+
 - Open-source / free AI infrastructure
 
 **Deployment:**
+
 - Vercel Free Tier
 
 **Source Control:**
+
 - GitHub
 
 ---
@@ -44,6 +52,7 @@ Prefer a modular monolith.
 Do not create microservices unless there is a clear technical requirement.
 
 Keep clearly separated:
+
 - Frontend
 - Backend
 - Database
@@ -83,9 +92,11 @@ admin_activity
 Enable Row Level Security on all tables.
 
 **Public users:**
+
 - Read published content only
 
 **Admin users:**
+
 - Create
 - Read
 - Update
@@ -110,6 +121,7 @@ Verify authorization server-side.
 ## 6. Storage
 
 **Storage buckets:**
+
 ```
 resources
 projects
@@ -196,6 +208,7 @@ Sources
 ## 10. RAG Safety
 
 The AI must:
+
 - Use retrieved context
 - Avoid hallucination
 - Cite sources
@@ -213,11 +226,11 @@ Because the system must remain free, implement limits.
 
 **Example:**
 
-| User Type     | Limit                       |
-|---------------|-----------------------------|
-| Anonymous     | 5 AI requests per hour      |
-| Authenticated | 10 AI requests per hour     |
-| Admin         | Higher configurable limit   |
+| User Type     | Limit                     |
+| ------------- | ------------------------- |
+| Anonymous     | 5 AI requests per hour    |
+| Authenticated | 10 AI requests per hour   |
+| Admin         | Higher configurable limit |
 
 Make these configurable.
 
@@ -226,7 +239,7 @@ Make these configurable.
 ## 12. File Limits
 
 | File Type | Maximum Size |
-|-----------|--------------|
+| --------- | ------------ |
 | PDF       | 10 MB        |
 | CSV       | 5 MB         |
 | Images    | 5 MB         |
@@ -238,6 +251,7 @@ Make limits configurable via environment variables.
 ## 13. File Security
 
 Validate:
+
 - MIME type
 - File extension
 - File size
@@ -253,6 +267,7 @@ Never trust client-provided MIME types alone.
 ## 14. Code Quality
 
 Use:
+
 - TypeScript (strict mode)
 - ESLint
 - Prettier
@@ -293,6 +308,7 @@ Return safe, user-friendly errors.
 Log detailed technical errors securely.
 
 Never expose:
+
 - Stack traces
 - Secrets
 - Raw database errors
@@ -331,6 +347,7 @@ The application will use a new production domain.
 Do not hardcode any previous Vercel URL.
 
 Use `VITE_SITE_URL` for:
+
 - SEO metadata
 - Sitemap generation
 - Canonical URLs
@@ -344,6 +361,7 @@ Use `VITE_SITE_URL` for:
 Use automated tests where practical.
 
 **Test:**
+
 - Authentication flows
 - Database operations
 - API routes
@@ -360,6 +378,7 @@ Perform manual responsive testing on all major breakpoints.
 ## 20. Performance
 
 **Optimize:**
+
 - Images
 - Fonts
 - API calls
@@ -367,6 +386,7 @@ Perform manual responsive testing on all major breakpoints.
 - AI requests
 
 **Use:**
+
 - Server components where possible
 - Response caching
 - Lazy loading
@@ -379,6 +399,7 @@ Avoid unnecessary client-side JavaScript.
 ## 21. SEO
 
 **Implement:**
+
 - Page head metadata (TanStack Router route head hooks)
 - Sitemap generator (public/sitemap.xml)
 - Robots.txt (public/robots.txt)
@@ -393,6 +414,7 @@ Avoid unnecessary client-side JavaScript.
 Follow WCAG principles.
 
 **Ensure:**
+
 - Keyboard navigation
 - Semantic HTML
 - Proper ARIA labels
@@ -434,6 +456,7 @@ Deployment should fail if critical checks fail.
 Use free monitoring options where possible.
 
 **Track:**
+
 - Build failures
 - API errors
 - AI errors
@@ -446,6 +469,7 @@ Do not collect unnecessary user data.
 ## 26. Backups
 
 **Maintain:**
+
 - Database backup strategy
 - Project source code in GitHub
 - Important documents locally
@@ -459,6 +483,7 @@ Do not rely on a single copy of important content.
 The application should prioritize free infrastructure.
 
 **Preferred:**
+
 - Vercel Free Tier
 - Supabase Free Tier
 - GitHub Free

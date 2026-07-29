@@ -6,8 +6,8 @@
  * Types:           import type { Project, Profile, ... } from '@/lib/supabase'
  */
 
-export { supabase } from './client'
-export { createAdminClient, createServerClient } from './server'
+export { supabase } from "./client";
+export { createAdminClient, createServerClient } from "./server";
 export type {
   Database,
   Json,
@@ -21,4 +21,4 @@ export type {
   Certificate,
   Conversation,
   Message,
-} from './types'
+} from "./types";

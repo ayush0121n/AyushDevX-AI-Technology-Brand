@@ -67,7 +67,7 @@ AYUSHDEVX
 ## Tech Stack
 
 | Layer          | Technology                            |
-|----------------|---------------------------------------|
+| -------------- | ------------------------------------- |
 | Framework      | TanStack Start (React 19 + Vite)      |
 | Routing        | TanStack Router (file-system based)   |
 | Language       | TypeScript                            |
@@ -85,6 +85,7 @@ AYUSHDEVX
 ## Core Features
 
 ### Phase 1 — Foundation
+
 - Brand foundation
 - Design system
 - Homepage
@@ -92,37 +93,44 @@ AYUSHDEVX
 - Footer
 
 ### Phase 2 — Content
+
 - Projects
 - Products
 - About
 - Contact
 
 ### Phase 3 — Knowledge Hub
+
 - PDF storage
 - Search
 - Categories
 - Admin Dashboard
 
 ### Phase 4 — AI Portfolio Assistant
+
 - RAG-powered assistant
 - AI Lab dashboard
 
 ### Phase 5 — AI PDF Chat
+
 - Document upload
 - Question answering
 - Source citations
 
 ### Phase 6 — AI Resume Analyzer
+
 - Resume analysis
 - Job description matching
 - ATS scoring
 
 ### Phase 7 — Additional AI Tools
+
 - AI Data Analyst
 - AI Code Reviewer
 - AI Interview Simulator
 
 ### Phase 8 — Production
+
 - SEO
 - Performance
 - Security
@@ -134,7 +142,7 @@ AYUSHDEVX
 ## AI Lab Tools
 
 | Tool                   | Description                                      |
-|------------------------|--------------------------------------------------|
+| ---------------------- | ------------------------------------------------ |
 | AI Portfolio Assistant | RAG-powered assistant for AyushDevX content      |
 | AI PDF Chat            | Upload documents and ask questions               |
 | AI Resume Analyzer     | Analyze resumes against job descriptions         |
