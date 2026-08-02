@@ -67,6 +67,11 @@ export function Footer() {
                   AI Lab ↗
                 </a>
               </li>
+              <li>
+                <a href="/admin/login" className="hover:underline text-ink/70">
+                  Admin Console ↗
+                </a>
+              </li>
             </ul>
           </div>
         </div>

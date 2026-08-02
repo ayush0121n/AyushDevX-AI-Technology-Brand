@@ -1,0 +1,9 @@
+date,region,product,sales,profit
+2026-01-01,North,Widget A,150,50
+2026-01-02,South,Widget B,200,80
+2026-01-03,East,Widget A,120,40
+2026-01-04,West,Widget C,300,120
+2026-01-05,North,Widget B,180,70
+2026-01-06,South,Widget A,160,60
+2026-01-07,East,Widget C,280,110
+2026-01-08,West,Widget B,190,75

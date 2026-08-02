@@ -159,6 +159,7 @@ export interface Database {
           title: string;
           description: string | null;
           category_id: string | null;
+          storage_path: string | null;
           file_url: string | null;
           file_size: number | null;
           file_type: string | null;
@@ -175,6 +176,7 @@ export interface Database {
           title: string;
           description?: string | null;
           category_id?: string | null;
+          storage_path?: string | null;
           file_url?: string | null;
           file_size?: number | null;
           file_type?: string | null;

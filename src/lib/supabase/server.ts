@@ -26,6 +26,28 @@ export function createAdminClient() {
 }
 
 /**
+ * Untyped admin client for mutation operations where strict DB types
+ * cause `never` inference issues (e.g. columns not yet in the generated schema).
+ */
+export function createUntypedAdminClient() {
+  const supabaseUrl = process.env.VITE_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error(
+      "Missing server-side Supabase env vars: VITE_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required.",
+    );
+  }
+
+  return createClient(supabaseUrl, serviceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
+}
+
+/**
  * Server-side Supabase anon client.
  * Use inside TanStack Start server functions when you want RLS enforced.
  * Pass the user's JWT as the Authorization header to identify the user.

@@ -7,7 +7,7 @@
  */
 
 export { supabase } from "./client";
-export { createAdminClient, createServerClient } from "./server";
+export { createAdminClient, createServerClient, createUntypedAdminClient } from "./server";
 export type {
   Database,
   Json,

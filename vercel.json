@@ -3,6 +3,7 @@
   "outputDirectory": "dist/client",
   "framework": null,
   "routes": [
+    { "src": "/api/python/(.*)", "dest": "/api/index.py" },
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/_shell.html" }
   ]
