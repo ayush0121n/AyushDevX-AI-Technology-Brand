@@ -82,7 +82,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           content:
             "AyushDevX is a professional AI and technology brand building intelligent applications, AI-powered tools, and digital products.",
         },
-        { name: "author", content: "AyushDevX" },
+        { name: "author", content: "Ayush Gajanan Narkhede" },
+        { name: "keywords", content: "AI, Machine Learning, Full-Stack Developer, React, Node.js, Pune, AyushDevX, RAG, Generative AI" },
+        { name: "theme-color", content: "#0f0f0f" },
         { property: "og:title", content: "AyushDevX — AI & Technology Brand" },
         {
           property: "og:description",
@@ -90,6 +92,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
             "Building Intelligent Digital Experiences with AI & Technology.",
         },
         { property: "og:type", content: "website" },
+        { property: "og:url", content: "https://ayushdevxai.vercel.app/" },
+        { property: "og:site_name", content: "AyushDevX" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: "AyushDevX — AI & Technology Brand" },
         {
@@ -126,12 +130,16 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+import { SecurityWrapper } from "@/components/site/SecurityWrapper";
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <Outlet />
-    </QueryClientProvider>
+    <SecurityWrapper>
+      <QueryClientProvider client={queryClient}>
+        <Outlet />
+      </QueryClientProvider>
+    </SecurityWrapper>
   );
 }

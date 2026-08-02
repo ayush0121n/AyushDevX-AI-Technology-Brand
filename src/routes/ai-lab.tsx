@@ -474,7 +474,7 @@ function PortfolioTab() {
         </div>
 
         {/* Right — Chat Window */}
-        <div className="lg:col-span-7 border border-border bg-card flex flex-col h-[560px]">
+        <div className="lg:col-span-7 border border-border bg-card flex flex-col min-h-[450px] md:h-[560px]">
           {/* Header */}
           <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-muted/30">
             <div className="flex items-center gap-2.5">

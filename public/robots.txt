@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://your-new-domain.com/sitemap.xml
+Sitemap: https://ayushdevxai.vercel.app/sitemap.xml

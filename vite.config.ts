@@ -15,4 +15,12 @@ export default defineConfig({
       enabled: true,
     },
   },
+  vite: {
+    esbuild: {
+      drop: ["console", "debugger"],
+    },
+    build: {
+      minify: "esbuild",
+    }
+  }
 });
