@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "@tanstack/react-router";
 import { Magnetic } from "./Magnetic";
 
 const links = [
@@ -26,14 +27,14 @@ export function Nav() {
       >
         {/* Brand logo */}
         <Magnetic>
-          <a
-            href="/"
+          <Link
+            to="/"
             aria-label="AyushDevX — Home"
             className="font-display text-xl tracking-tight inline-flex items-baseline gap-0.5"
           >
             AYUSHDEV<span className="text-flame">X</span>
             <sup className="text-[0.5rem] align-super opacity-60">®</sup>
-          </a>
+          </Link>
         </Magnetic>
 
         {/* Desktop links — show only first 6 to avoid overflow */}
@@ -41,12 +42,12 @@ export function Nav() {
           {links.slice(1, 7).map((l) => (
             <li key={l.href}>
               <Magnetic strength={0.4}>
-                <a
-                  href={l.href}
+                <Link
+                  to={l.href}
                   className="relative inline-block hover:text-flame transition-colors after:content-[''] after:absolute after:left-0 after:-bottom-1 after:h-px after:w-0 after:bg-flame hover:after:w-full after:transition-all after:duration-500"
                 >
                   {l.label}
-                </a>
+                </Link>
               </Magnetic>
             </li>
           ))}
@@ -55,12 +56,12 @@ export function Nav() {
         <div className="flex items-center gap-4">
           {/* CTA */}
           <Magnetic strength={0.5}>
-            <a
-              href="/contact"
+            <Link
+              to="/contact"
               className="hidden md:inline-block text-[0.65rem] uppercase tracking-[0.2em] border border-current px-4 py-2 hover:bg-flame hover:text-ink hover:border-flame transition-colors"
             >
               Get in Touch
-            </a>
+            </Link>
           </Magnetic>
 
           {/* Mobile hamburger */}
@@ -102,17 +103,20 @@ export function Nav() {
             className="fixed inset-0 z-40 bg-background/95 backdrop-blur-md flex flex-col items-center justify-center gap-8 lg:hidden"
           >
             {links.map((l, i) => (
-              <motion.a
+              <motion.div
                 key={l.href}
-                href={l.href}
                 onClick={() => setOpen(false)}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05, duration: 0.4 }}
-                className="font-display text-4xl hover:text-flame transition-colors"
               >
-                {l.label}
-              </motion.a>
+                <Link
+                  to={l.href}
+                  className="font-display text-4xl hover:text-flame transition-colors"
+                >
+                  {l.label}
+                </Link>
+              </motion.div>
             ))}
           </motion.div>
         )}

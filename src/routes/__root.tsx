@@ -48,6 +48,11 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           Something went wrong on our end. You can try refreshing or head back
           home.
         </p>
+        <div className="mt-4 p-4 bg-red-950 text-red-200 text-left text-xs overflow-auto rounded max-h-64 whitespace-pre-wrap">
+          <strong>{error.message}</strong>
+          <br/>
+          {error.stack}
+        </div>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
             onClick={() => {

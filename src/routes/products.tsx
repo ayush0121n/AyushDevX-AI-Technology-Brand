@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Nav } from "@/components/site/Nav";
@@ -236,12 +236,12 @@ function ProductsPage() {
                 <div className="pt-4 border-t border-border flex items-center justify-between">
                   {product.status === "published" && product.demoUrl ? (
                     <Magnetic strength={0.3}>
-                      <a
-                        href={product.demoUrl}
+                      <Link
+                        to={product.demoUrl}
                         className="text-xs uppercase tracking-[0.2em] bg-flame text-ink px-6 py-3 inline-block font-medium hover:bg-flame/90 transition-colors"
                       >
                         Launch Tool →
-                      </a>
+                      </Link>
                     </Magnetic>
                   ) : (
                     <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground italic">

@@ -28,9 +28,9 @@ class DataAnalystRequest(BaseModel):
 
 @app.post("/api/python/data_analyst")
 async def analyze_data(req: DataAnalystRequest):
-    api_key = os.environ.get("GROQ_API_KEY")
+    api_key = os.environ.get("HUGGINGFACE_API_KEY")
     if not api_key:
-        raise HTTPException(status_code=500, detail="Missing GROQ_API_KEY")
+        raise HTTPException(status_code=500, detail="Missing HUGGINGFACE_API_KEY")
 
     try:
         # Load CSV context using pandas to generate a precise statistical summary
@@ -75,14 +75,14 @@ Do not hallucinate data. If the user asks for calculations, use the exact pandas
         }
         
         payload = {
-            "model": "llama-3.1-8b-instant",
+            "model": "mistralai/Mixtral-8x7B-Instruct-v0.1",
             "messages": messages,
             "temperature": 0.1,
             "max_tokens": 1500
         }
         
         with httpx.Client() as client:
-            response = client.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload, timeout=30.0)
+            response = client.post("https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1/v1/chat/completions", headers=headers, json=payload, timeout=30.0)
             response.raise_for_status()
         
         answer = response.json()["choices"][0]["message"]["content"] or "No response generated."
@@ -100,9 +100,9 @@ import re
 
 @app.post("/api/python/ats_matcher")
 async def analyze_ats(req: AtsRequest):
-    api_key = os.environ.get("GROQ_API_KEY")
+    api_key = os.environ.get("HUGGINGFACE_API_KEY")
     if not api_key:
-        raise HTTPException(status_code=500, detail="Missing GROQ_API_KEY")
+        raise HTTPException(status_code=500, detail="Missing HUGGINGFACE_API_KEY")
 
     try:
         # Pre-process inputs using Python regex to find common technical keywords
@@ -135,7 +135,7 @@ Be highly accurate and do not fabricate matches.
         }
         
         payload = {
-            "model": "llama-3.3-70b-versatile",
+            "model": "mistralai/Mixtral-8x7B-Instruct-v0.1",
             "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
@@ -146,7 +146,7 @@ Be highly accurate and do not fabricate matches.
         }
         
         with httpx.Client() as client:
-            response = client.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload, timeout=30.0)
+            response = client.post("https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1/v1/chat/completions", headers=headers, json=payload, timeout=30.0)
             response.raise_for_status()
             
         import json
@@ -165,9 +165,9 @@ class PdfChatRequest(BaseModel):
 
 @app.post("/api/python/pdf_chat")
 async def chat_pdf(req: PdfChatRequest):
-    api_key = os.environ.get("GROQ_API_KEY")
+    api_key = os.environ.get("HUGGINGFACE_API_KEY")
     if not api_key:
-        raise HTTPException(status_code=500, detail="Missing GROQ_API_KEY")
+        raise HTTPException(status_code=500, detail="Missing HUGGINGFACE_API_KEY")
 
     try:
         doc_content = req.customContent if req.customContent else f"Simulated content for {req.documentId}"
@@ -193,14 +193,14 @@ Include 'PAGE_REF: [page]' at the end."""
         }
         
         payload = {
-            "model": "llama-3.1-8b-instant",
+            "model": "mistralai/Mixtral-8x7B-Instruct-v0.1",
             "messages": messages,
             "temperature": 0.2,
             "max_tokens": 1000
         }
         
         with httpx.Client() as client:
-            response = client.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload, timeout=30.0)
+            response = client.post("https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1/v1/chat/completions", headers=headers, json=payload, timeout=30.0)
             response.raise_for_status()
             
         text = response.json()["choices"][0]["message"]["content"]
@@ -253,9 +253,9 @@ class PortfolioRequest(BaseModel):
 
 @app.post("/api/python/portfolio")
 async def chat_portfolio(req: PortfolioRequest):
-    api_key = os.environ.get("GROQ_API_KEY")
+    api_key = os.environ.get("HUGGINGFACE_API_KEY")
     if not api_key:
-        raise HTTPException(status_code=500, detail="Missing GROQ_API_KEY")
+        raise HTTPException(status_code=500, detail="Missing HUGGINGFACE_API_KEY")
 
     try:
         system_prompt = """You are the AyushDevX AI Portfolio Assistant — a precise, technically grounded assistant for the AyushDevX brand.
@@ -345,14 +345,14 @@ async def chat_portfolio(req: PortfolioRequest):
         }
         
         payload = {
-            "model": "llama-3.1-8b-instant",
+            "model": "mistralai/Mixtral-8x7B-Instruct-v0.1",
             "messages": messages,
             "temperature": 0.3,
             "max_tokens": 400
         }
         
         with httpx.Client() as client:
-            response = client.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload, timeout=30.0)
+            response = client.post("https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1/v1/chat/completions", headers=headers, json=payload, timeout=30.0)
             response.raise_for_status()
             
         answer = response.json()["choices"][0]["message"]["content"]
