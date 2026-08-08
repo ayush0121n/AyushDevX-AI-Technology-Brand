@@ -5,7 +5,7 @@ import pandas as pd
 import io
 import os
 from groq import Groq
-import httpx
+import requests
 
 app = FastAPI(docs_url="/api/python/docs", openapi_url="/api/python/openapi.json")
 
@@ -80,9 +80,8 @@ Do not hallucinate data. If the user asks for calculations, use the exact pandas
             "max_tokens": 1500
         }
         
-        with httpx.Client() as client:
-            response = client.post("https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1/v1/chat/completions", headers=headers, json=payload, timeout=30.0)
-            response.raise_for_status()
+        response = requests.post("https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1/v1/chat/completions", headers=headers, json=payload, timeout=30.0)
+        response.raise_for_status()
         
         answer = response.json()["choices"][0]["message"]["content"] or "No response generated."
         return {"answer": answer, "error": None}
@@ -142,8 +141,7 @@ Be highly accurate and do not fabricate matches.
             "response_format": {"type": "json_object"}
         }
         
-        with httpx.Client() as client:
-            response = client.post("https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1/v1/chat/completions", headers=headers, json=payload, timeout=30.0)
+        response = requests.post("https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1/v1/chat/completions", headers=headers, json=payload, timeout=30.0)
             response.raise_for_status()
             
         import json
@@ -194,8 +192,7 @@ Include 'PAGE_REF: [page]' at the end."""
             "max_tokens": 1000
         }
         
-        with httpx.Client() as client:
-            response = client.post("https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1/v1/chat/completions", headers=headers, json=payload, timeout=30.0)
+        response = requests.post("https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1/v1/chat/completions", headers=headers, json=payload, timeout=30.0)
             response.raise_for_status()
             
         text = response.json()["choices"][0]["message"]["content"]
@@ -346,8 +343,7 @@ async def chat_portfolio(req: PortfolioRequest):
             "max_tokens": 400
         }
         
-        with httpx.Client() as client:
-            response = client.post("https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1/v1/chat/completions", headers=headers, json=payload, timeout=30.0)
+        response = requests.post("https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1/v1/chat/completions", headers=headers, json=payload, timeout=30.0)
             response.raise_for_status()
             
         answer = response.json()["choices"][0]["message"]["content"]
