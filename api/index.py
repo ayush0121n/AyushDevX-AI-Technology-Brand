@@ -142,7 +142,7 @@ Be highly accurate and do not fabricate matches.
         }
         
         response = requests.post("https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1/v1/chat/completions", headers=headers, json=payload, timeout=30.0)
-            response.raise_for_status()
+        response.raise_for_status()
             
         import json
         answer = response.json()["choices"][0]["message"]["content"]
@@ -193,7 +193,7 @@ Include 'PAGE_REF: [page]' at the end."""
         }
         
         response = requests.post("https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1/v1/chat/completions", headers=headers, json=payload, timeout=30.0)
-            response.raise_for_status()
+        response.raise_for_status()
             
         text = response.json()["choices"][0]["message"]["content"]
         
@@ -344,7 +344,7 @@ async def chat_portfolio(req: PortfolioRequest):
         }
         
         response = requests.post("https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1/v1/chat/completions", headers=headers, json=payload, timeout=30.0)
-            response.raise_for_status()
+        response.raise_for_status()
             
         answer = response.json()["choices"][0]["message"]["content"]
         
