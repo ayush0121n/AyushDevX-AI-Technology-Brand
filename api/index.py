@@ -64,7 +64,7 @@ Do not hallucinate data. If the user asks for calculations, use the exact pandas
 
         messages = [{"role": "system", "content": system_prompt}]
         for m in (req.history or []):
-            messages.append({"role": m.role, "content": m.content})
+            messages.append({"role": m.get("role", "user"), "content": m.get("content", "")})
         
         messages.append({"role": "user", "content": req.message})
 
@@ -177,7 +177,7 @@ Include 'PAGE_REF: [page]' at the end."""
 
         messages = [{"role": "system", "content": system_prompt}]
         for m in (req.history or []):
-            messages.append({"role": m.role, "content": m.content})
+            messages.append({"role": m.get("role", "user"), "content": m.get("content", "")})
         messages.append({"role": "user", "content": req.message})
 
         headers = {
