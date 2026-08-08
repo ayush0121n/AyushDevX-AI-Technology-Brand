@@ -29,9 +29,10 @@ class DataAnalystRequest(BaseModel):
 
 @app.post("/api/python/data_analyst")
 async def analyze_data(req: DataAnalystRequest):
-    api_key = os.environ.get("HUGGINGFACE_API_KEY")
+    api_key = os.environ.get("GROQ_API_KEY")
     if not api_key:
-        raise HTTPException(status_code=500, detail="Missing HUGGINGFACE_API_KEY")
+        raise HTTPException(status_code=500, detail="Missing GROQ_API_KEY")
+    client = Groq(api_key=api_key)
 
     try:
         # Load CSV context using pandas to generate a precise statistical summary
@@ -68,22 +69,8 @@ Do not hallucinate data. If the user asks for calculations, use the exact pandas
         
         messages.append({"role": "user", "content": req.message})
 
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
-        }
-        
-        payload = {
-            "model": "mistralai/Mixtral-8x7B-Instruct-v0.1",
-            "messages": messages,
-            "temperature": 0.1,
-            "max_tokens": 1500
-        }
-        
-        response = requests.post("https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1/v1/chat/completions", headers=headers, json=payload, timeout=30.0)
-        response.raise_for_status()
-        
-        answer = response.json()["choices"][0]["message"]["content"] or "No response generated."
+        chat_completion = client.chat.completions.create(messages=messages, model="llama-3.1-8b-instant", temperature=0.1, max_tokens=1500)
+        answer = chat_completion.choices[0].message.content or "No response generated."
         return {"answer": answer, "error": None}
         
     except Exception as e:
@@ -98,9 +85,10 @@ import re
 
 @app.post("/api/python/ats_matcher")
 async def analyze_ats(req: AtsRequest):
-    api_key = os.environ.get("HUGGINGFACE_API_KEY")
+    api_key = os.environ.get("GROQ_API_KEY")
     if not api_key:
-        raise HTTPException(status_code=500, detail="Missing HUGGINGFACE_API_KEY")
+        raise HTTPException(status_code=500, detail="Missing GROQ_API_KEY")
+    client = Groq(api_key=api_key)
 
     try:
         # Pre-process inputs using Python regex to find common technical keywords
@@ -125,27 +113,9 @@ Be highly accurate and do not fabricate matches.
 """
         user_prompt = f"RESUME:\n{req.resumeText}\n\nJOB DESCRIPTION:\n{req.jobText}\n\nAnalyze and return JSON."
         
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
-        }
-        
-        payload = {
-            "model": "mistralai/Mixtral-8x7B-Instruct-v0.1",
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt}
-            ],
-            "temperature": 0.1,
-            "max_tokens": 1000,
-            "response_format": {"type": "json_object"}
-        }
-        
-        response = requests.post("https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1/v1/chat/completions", headers=headers, json=payload, timeout=30.0)
-        response.raise_for_status()
-            
+        chat_completion = client.chat.completions.create(messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}], model="llama-3.1-8b-instant", temperature=0.1, max_tokens=1000, response_format={"type": "json_object"})
         import json
-        answer = response.json()["choices"][0]["message"]["content"]
+        answer = chat_completion.choices[0].message.content
         return {"result": json.loads(answer)}
         
     except Exception as e:
@@ -160,9 +130,10 @@ class PdfChatRequest(BaseModel):
 
 @app.post("/api/python/pdf_chat")
 async def chat_pdf(req: PdfChatRequest):
-    api_key = os.environ.get("HUGGINGFACE_API_KEY")
+    api_key = os.environ.get("GROQ_API_KEY")
     if not api_key:
-        raise HTTPException(status_code=500, detail="Missing HUGGINGFACE_API_KEY")
+        raise HTTPException(status_code=500, detail="Missing GROQ_API_KEY")
+    client = Groq(api_key=api_key)
 
     try:
         doc_content = req.customContent if req.customContent else f"Simulated content for {req.documentId}"
@@ -180,22 +151,8 @@ Include 'PAGE_REF: [page]' at the end."""
             messages.append({"role": m.get("role", "user"), "content": m.get("content", "")})
         messages.append({"role": "user", "content": req.message})
 
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
-        }
-        
-        payload = {
-            "model": "mistralai/Mixtral-8x7B-Instruct-v0.1",
-            "messages": messages,
-            "temperature": 0.2,
-            "max_tokens": 1000
-        }
-        
-        response = requests.post("https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1/v1/chat/completions", headers=headers, json=payload, timeout=30.0)
-        response.raise_for_status()
-            
-        text = response.json()["choices"][0]["message"]["content"]
+        chat_completion = client.chat.completions.create(messages=messages, model="llama-3.1-8b-instant", temperature=0.2, max_tokens=1000)
+        text = chat_completion.choices[0].message.content
         
         # Parse PAGE_REF
         page_ref_match = re.search(r'\nPAGE_REF:\s*(.+)$', text, re.MULTILINE)
@@ -247,9 +204,10 @@ class PortfolioRequest(BaseModel):
 
 @app.post("/api/python/portfolio")
 async def chat_portfolio(req: PortfolioRequest):
-    api_key = os.environ.get("HUGGINGFACE_API_KEY")
+    api_key = os.environ.get("GROQ_API_KEY")
     if not api_key:
-        raise HTTPException(status_code=500, detail="Missing HUGGINGFACE_API_KEY")
+        raise HTTPException(status_code=500, detail="Missing GROQ_API_KEY")
+    client = Groq(api_key=api_key)
 
     try:
         system_prompt = """You are the AyushDevX AI Portfolio Assistant — a precise, technically grounded assistant for the AyushDevX brand.
@@ -331,22 +289,8 @@ async def chat_portfolio(req: PortfolioRequest):
             messages.append({"role": m.get("role", "user"), "content": m.get("content", "")})
         messages.append({"role": "user", "content": req.message})
 
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
-        }
-        
-        payload = {
-            "model": "mistralai/Mixtral-8x7B-Instruct-v0.1",
-            "messages": messages,
-            "temperature": 0.3,
-            "max_tokens": 400
-        }
-        
-        response = requests.post("https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1/v1/chat/completions", headers=headers, json=payload, timeout=30.0)
-        response.raise_for_status()
-            
-        answer = response.json()["choices"][0]["message"]["content"]
+        chat_completion = client.chat.completions.create(messages=messages, model="llama-3.1-8b-instant", temperature=0.3, max_tokens=400)
+        answer = chat_completion.choices[0].message.content
         
         lower_query_answer = (req.message + " " + answer).lower()
         citations = []
