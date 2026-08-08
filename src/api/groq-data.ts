@@ -36,7 +36,18 @@ export const queryDataAnalyst = async ({ data }: { data: DataInput }): Promise<D
       if (res.status === 429) {
         return { answer: "Rate limited. Please wait.", error: "rate_limited" };
       }
-      return { answer: "Error communicating with backend.", error: "api_error" };
+      let errorMsg = "Error communicating with backend.";
+      try {
+        const errorJson = await res.json();
+        if (errorJson.detail) {
+          errorMsg = typeof errorJson.detail === "string" ? errorJson.detail : JSON.stringify(errorJson.detail);
+        } else if (errorJson.error) {
+          errorMsg = errorJson.error;
+        }
+      } catch (e) {
+        // ignore
+      }
+      return { answer: errorMsg, error: "api_error" };
     }
 
     const json = await res.json();

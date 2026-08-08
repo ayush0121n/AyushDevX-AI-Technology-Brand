@@ -48,7 +48,18 @@ export const analyzeAts = async ({ data }: { data: AtsInput }): Promise<AtsRespo
       if (res.status === 429) {
         return { error: "rate_limited", errorMessage: "Rate limited. Please wait." };
       }
-      return { error: "api_error", errorMessage: "Error communicating with ATS backend." };
+      let errorMsg = "Error communicating with ATS backend.";
+      try {
+        const errorJson = await res.json();
+        if (errorJson.detail) {
+          errorMsg = typeof errorJson.detail === "string" ? errorJson.detail : JSON.stringify(errorJson.detail);
+        } else if (errorJson.error) {
+          errorMsg = errorJson.error;
+        }
+      } catch (e) {
+        // ignore
+      }
+      return { error: "api_error", errorMessage: errorMsg };
     }
 
     const json = await res.json() as { result?: any; error?: string };

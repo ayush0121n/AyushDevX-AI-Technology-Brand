@@ -5,6 +5,7 @@ import pandas as pd
 import io
 import os
 from groq import Groq
+import httpx
 
 app = FastAPI(docs_url="/api/python/docs", openapi_url="/api/python/openapi.json")
 
@@ -67,8 +68,6 @@ Do not hallucinate data. If the user asks for calculations, use the exact pandas
         
         messages.append({"role": "user", "content": req.message})
 
-        import httpx
-        
         headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json"
@@ -126,8 +125,6 @@ CRITICAL: Return ONLY a valid JSON object matching exactly this schema:
 Be highly accurate and do not fabricate matches.
 """
         user_prompt = f"RESUME:\n{req.resumeText}\n\nJOB DESCRIPTION:\n{req.jobText}\n\nAnalyze and return JSON."
-
-        import httpx
         
         headers = {
             "Authorization": f"Bearer {api_key}",
@@ -185,8 +182,6 @@ Include 'PAGE_REF: [page]' at the end."""
             messages.append({"role": m.role, "content": m.content})
         messages.append({"role": "user", "content": req.message})
 
-        import httpx
-        
         headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json"
@@ -220,8 +215,10 @@ Include 'PAGE_REF: [page]' at the end."""
         }
         
     except Exception as e:
-        print(f"Error in pdf_chat: {e}")
-        return {"error": str(e), "answer": "", "pageRef": "", "citations": []}
+        import traceback
+        tb = traceback.format_exc()
+        print(f"Error in pdf_chat: {tb}")
+        return {"error": f"{str(e)}\n\nTraceback:\n{tb}", "answer": "", "pageRef": "", "citations": []}
 
 import base64
 import io
@@ -337,8 +334,6 @@ async def chat_portfolio(req: PortfolioRequest):
             messages.append({"role": m.get("role", "user"), "content": m.get("content", "")})
         messages.append({"role": "user", "content": req.message})
 
-        import httpx
-        
         headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json"

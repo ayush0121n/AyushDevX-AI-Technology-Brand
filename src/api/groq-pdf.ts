@@ -48,7 +48,18 @@ export const queryPdfChat = async ({ data }: { data: PdfChatInput }): Promise<Pd
       if (res.status === 429) {
         return { answer: "Rate limited. Please wait.", pageRef: "", citations: [], documentTitle: docTitle, error: "rate_limited" };
       }
-      return { answer: "Error communicating with PDF backend.", pageRef: "", citations: [], documentTitle: docTitle, error: "api_error" };
+      let errorMsg = "Error communicating with PDF backend.";
+      try {
+        const errorJson = await res.json();
+        if (errorJson.detail) {
+          errorMsg = typeof errorJson.detail === "string" ? errorJson.detail : JSON.stringify(errorJson.detail);
+        } else if (errorJson.error) {
+          errorMsg = errorJson.error;
+        }
+      } catch (e) {
+        // ignore
+      }
+      return { answer: errorMsg, pageRef: "", citations: [], documentTitle: docTitle, error: "api_error" };
     }
 
     const json = await res.json() as { answer?: string; pageRef?: string; citations?: string[]; error?: string };
