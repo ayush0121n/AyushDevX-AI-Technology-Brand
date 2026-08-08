@@ -23,6 +23,17 @@ if os.path.exists(env_path):
                 key, val = line.split('=', 1)
                 os.environ[key.strip()] = val.strip()
 
+@app.get("/api/python/health")
+async def health():
+    groq_key = os.environ.get("GROQ_API_KEY")
+    return {
+        "status": "ok",
+        "groq_key_set": bool(groq_key),
+        "groq_key_prefix": groq_key[:8] + "..." if groq_key else None,
+        "python_version": __import__("sys").version,
+    }
+
+
 def get_groq_client() -> Groq:
     api_key = os.environ.get("GROQ_API_KEY")
     if not api_key:
