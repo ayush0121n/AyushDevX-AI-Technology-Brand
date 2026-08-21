@@ -65,9 +65,9 @@ def debug():
                     "Content-Type": "application/json",
                 },
                 json={
-                    "model": "groq/compound-mini",
+                    "model": "qwen/qwen3.6-27b",
                     "messages": [{"role": "user", "content": "Say OK"}],
-                    "max_tokens": 5,
+                    "max_tokens": 100,
                     "temperature": 0,
                     "stream": False,
                 },
@@ -153,7 +153,10 @@ def call_groq(
         raise RuntimeError(f"api_error: Groq returned {resp.status_code}.")
 
     data = resp.json()
-    return data["choices"][0]["message"]["content"] or ""
+    raw = data["choices"][0]["message"]["content"] or ""
+    # Strip <think>...</think> reasoning blocks that qwen/qwen3.6-27b emits
+    cleaned = re.sub(r"<think>[\s\S]*?</think>", "", raw, flags=re.IGNORECASE).strip()
+    return cleaned
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -220,7 +223,7 @@ def analyze_data(req: DataAnalystRequest):
 
         answer = call_groq(
             api_key=api_key,
-            model="groq/compound-mini",
+            model="qwen/qwen3.6-27b",
             messages=messages,
             max_tokens=800,
             temperature=0.1,
@@ -269,7 +272,7 @@ Be highly accurate. Do not fabricate matches."""
 
         answer = call_groq(
             api_key=api_key,
-            model="groq/compound-mini",
+            model="qwen/qwen3.6-27b",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
@@ -319,7 +322,7 @@ def chat_pdf(req: PdfChatRequest):
 
         text = call_groq(
             api_key=api_key,
-            model="groq/compound-mini",
+            model="qwen/qwen3.6-27b",
             messages=messages,
             max_tokens=700,
             temperature=0.2,
@@ -460,7 +463,7 @@ def chat_portfolio(req: PortfolioRequest):
 
         answer = call_groq(
             api_key=api_key,
-            model="groq/compound-mini",
+            model="qwen/qwen3.6-27b",
             messages=messages,
             max_tokens=400,
             temperature=0.3,
