@@ -67,9 +67,10 @@ def debug():
                 json={
                     "model": "qwen/qwen3.6-27b",
                     "messages": [{"role": "user", "content": "Say OK"}],
-                    "max_tokens": 100,
+                    "max_tokens": 20,
                     "temperature": 0,
                     "stream": False,
+                    "reasoning_effort": "none",
                 },
             )
         return {
@@ -129,6 +130,8 @@ def call_groq(
         "max_tokens": max_tokens,
         "temperature": temperature,
         "stream": False,
+        # Disable Qwen3 internal reasoning/thinking mode — returns direct answers
+        "reasoning_effort": "none",
     }
     if json_mode:
         payload["response_format"] = {"type": "json_object"}
@@ -150,13 +153,15 @@ def call_groq(
     if resp.status_code >= 500:
         raise RuntimeError(f"server_error: Groq returned {resp.status_code}.")
     if not resp.is_success:
-        raise RuntimeError(f"api_error: Groq returned {resp.status_code}.")
+        raise RuntimeError(f"api_error: Groq returned {resp.status_code}. Body: {resp.text[:200]}")
 
     data = resp.json()
     raw = data["choices"][0]["message"]["content"] or ""
-    # Strip <think>...</think> reasoning blocks that qwen/qwen3.6-27b emits
-    cleaned = re.sub(r"<think>[\s\S]*?</think>", "", raw, flags=re.IGNORECASE).strip()
-    return cleaned
+    # Strip complete <think>...</think> blocks (safety net even with reasoning_effort=none)
+    cleaned = re.sub(r"<think>[\s\S]*?</think>", "", raw, flags=re.IGNORECASE)
+    # Strip any incomplete <think> block that never closed (truncated thinking)
+    cleaned = re.sub(r"<think>[\s\S]*$", "", cleaned, flags=re.IGNORECASE)
+    return cleaned.strip()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
