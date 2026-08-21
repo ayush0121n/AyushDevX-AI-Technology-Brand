@@ -20,6 +20,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
+import { Route as KnowledgeHubBlogSlugRouteImport } from './routes/knowledge-hub/blog.$slug'
 
 const ProjectsRoute = ProjectsRouteImport.update({
   id: '/projects',
@@ -76,6 +77,11 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AdminRoute,
 } as any)
+const KnowledgeHubBlogSlugRoute = KnowledgeHubBlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
+  getParentRoute: () => KnowledgeHubRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -84,11 +90,12 @@ export interface FileRoutesByFullPath {
   '/ai-lab': typeof AiLabRoute
   '/contact': typeof ContactRoute
   '/insights': typeof InsightsRoute
-  '/knowledge-hub': typeof KnowledgeHubRoute
+  '/knowledge-hub': typeof KnowledgeHubRouteWithChildren
   '/products': typeof ProductsRoute
   '/projects': typeof ProjectsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/': typeof AdminIndexRoute
+  '/knowledge-hub/blog/$slug': typeof KnowledgeHubBlogSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -96,11 +103,12 @@ export interface FileRoutesByTo {
   '/ai-lab': typeof AiLabRoute
   '/contact': typeof ContactRoute
   '/insights': typeof InsightsRoute
-  '/knowledge-hub': typeof KnowledgeHubRoute
+  '/knowledge-hub': typeof KnowledgeHubRouteWithChildren
   '/products': typeof ProductsRoute
   '/projects': typeof ProjectsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin': typeof AdminIndexRoute
+  '/knowledge-hub/blog/$slug': typeof KnowledgeHubBlogSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -110,11 +118,12 @@ export interface FileRoutesById {
   '/ai-lab': typeof AiLabRoute
   '/contact': typeof ContactRoute
   '/insights': typeof InsightsRoute
-  '/knowledge-hub': typeof KnowledgeHubRoute
+  '/knowledge-hub': typeof KnowledgeHubRouteWithChildren
   '/products': typeof ProductsRoute
   '/projects': typeof ProjectsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/': typeof AdminIndexRoute
+  '/knowledge-hub/blog/$slug': typeof KnowledgeHubBlogSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -130,6 +139,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/admin/login'
     | '/admin/'
+    | '/knowledge-hub/blog/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -142,6 +152,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/admin/login'
     | '/admin'
+    | '/knowledge-hub/blog/$slug'
   id:
     | '__root__'
     | '/'
@@ -155,6 +166,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/admin/login'
     | '/admin/'
+    | '/knowledge-hub/blog/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -164,7 +176,7 @@ export interface RootRouteChildren {
   AiLabRoute: typeof AiLabRoute
   ContactRoute: typeof ContactRoute
   InsightsRoute: typeof InsightsRoute
-  KnowledgeHubRoute: typeof KnowledgeHubRoute
+  KnowledgeHubRoute: typeof KnowledgeHubRouteWithChildren
   ProductsRoute: typeof ProductsRoute
   ProjectsRoute: typeof ProjectsRoute
 }
@@ -248,6 +260,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/knowledge-hub/blog/$slug': {
+      id: '/knowledge-hub/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/knowledge-hub/blog/$slug'
+      preLoaderRoute: typeof KnowledgeHubBlogSlugRouteImport
+      parentRoute: typeof KnowledgeHubRoute
+    }
   }
 }
 
@@ -263,6 +282,18 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface KnowledgeHubRouteChildren {
+  KnowledgeHubBlogSlugRoute: typeof KnowledgeHubBlogSlugRoute
+}
+
+const KnowledgeHubRouteChildren: KnowledgeHubRouteChildren = {
+  KnowledgeHubBlogSlugRoute: KnowledgeHubBlogSlugRoute,
+}
+
+const KnowledgeHubRouteWithChildren = KnowledgeHubRoute._addFileChildren(
+  KnowledgeHubRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -270,7 +301,7 @@ const rootRouteChildren: RootRouteChildren = {
   AiLabRoute: AiLabRoute,
   ContactRoute: ContactRoute,
   InsightsRoute: InsightsRoute,
-  KnowledgeHubRoute: KnowledgeHubRoute,
+  KnowledgeHubRoute: KnowledgeHubRouteWithChildren,
   ProductsRoute: ProductsRoute,
   ProjectsRoute: ProjectsRoute,
 }

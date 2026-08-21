@@ -1,4 +1,4 @@
-import { sanitizeInput, sanitizeHistory } from "./groq-shared";
+import { sanitizeInput } from "./groq-shared";
 import { z } from "zod";
 
 const atsResponseSchema = z.object({
@@ -30,50 +30,100 @@ export interface AtsResponse {
   errorMessage?: string;
 }
 
-export const analyzeAts = async ({ data }: { data: AtsInput }): Promise<AtsResponse> => {
+function classifyError(status: number, body: string): AtsResponse {
+  if (status === 429) {
+    return {
+      error: "rate_limited",
+      errorMessage: "The AI service is busy. Please wait 30 seconds and try again.",
+    };
+  }
+  if (status === 503) {
+    return {
+      error: "service_unavailable",
+      errorMessage: "AI service is temporarily unavailable. Please try again shortly.",
+    };
+  }
+  if (status === 408 || status === 504) {
+    return {
+      error: "timeout",
+      errorMessage: "The AI request timed out. Please try again.",
+    };
+  }
+  if (status >= 500) {
+    return {
+      error: "server_error",
+      errorMessage: "The AI backend encountered an error. Please try again in a moment.",
+    };
+  }
+  return {
+    error: "api_error",
+    errorMessage: body || "Something went wrong. Please try again.",
+  };
+}
+
+export const analyzeAts = async ({
+  data,
+}: {
+  data: AtsInput;
+}): Promise<AtsResponse> => {
   try {
     const cleanResume = sanitizeInput(data.resumeText);
     const cleanJob = sanitizeInput(data.jobText);
 
-    const res = await fetch("/api/python/ats_matcher", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        resumeText: cleanResume,
-        jobText: cleanJob,
-      }),
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25_000);
 
-    if (!res.ok) {
-      if (res.status === 429) {
-        return { error: "rate_limited", errorMessage: "Rate limited. Please wait." };
-      }
-      let errorMsg = "Error communicating with ATS backend.";
-      try {
-        const errorJson = await res.json();
-        if (errorJson.detail) {
-          errorMsg = typeof errorJson.detail === "string" ? errorJson.detail : JSON.stringify(errorJson.detail);
-        } else if (errorJson.error) {
-          errorMsg = errorJson.error;
-        }
-      } catch (e) {
-        // ignore
-      }
-      return { error: "api_error", errorMessage: errorMsg };
+    let res: Response;
+    try {
+      res = await fetch("/api/python/ats_matcher", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          resumeText: cleanResume,
+          jobText: cleanJob,
+        }),
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timeoutId);
     }
 
-    const json = await res.json() as { result?: any; error?: string };
+    if (!res.ok) {
+      let bodyText = "";
+      try {
+        const errorJson = await res.json();
+        bodyText = errorJson.detail || errorJson.error || "";
+      } catch {
+        // ignore
+      }
+      return classifyError(res.status, bodyText);
+    }
+
+    const json = (await res.json()) as { result?: unknown; error?: string };
+
     if (json.error) {
       return { error: "api_error", errorMessage: json.error };
     }
-    
+
     const validated = atsResponseSchema.safeParse(json.result);
     if (!validated.success) {
-      return { error: "parse_error", errorMessage: "Failed to parse ATS response." };
+      return {
+        error: "parse_error",
+        errorMessage: "Received an unexpected response format. Please try again.",
+      };
     }
+
     return { result: validated.data };
-  } catch (e: any) {
-    console.error("[ATS] Exception:", e.message);
-    return { error: "api_error", errorMessage: e.message };
+  } catch (e: unknown) {
+    if (e instanceof Error && e.name === "AbortError") {
+      return {
+        error: "timeout",
+        errorMessage: "Request timed out. Please try again.",
+      };
+    }
+    return {
+      error: "network_error",
+      errorMessage: "Cannot reach the AI backend. Please check your connection and try again.",
+    };
   }
 };

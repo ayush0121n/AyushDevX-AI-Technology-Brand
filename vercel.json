@@ -2,6 +2,12 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist/client",
   "framework": null,
+  "functions": {
+    "api/index.py": {
+      "runtime": "python3.12",
+      "maxDuration": 30
+    }
+  },
   "routes": [
     { "src": "/api/python/(.*)", "dest": "/api/index.py" },
     { "handle": "filesystem" },

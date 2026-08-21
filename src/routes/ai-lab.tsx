@@ -9,6 +9,34 @@ import { queryPdfChat } from "@/api/groq-pdf";
 import { analyzeAts, type AtsResult } from "@/api/groq-ats";
 import { queryDataAnalyst } from "@/api/groq-data";
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Backend Status Hook
+// Pings /api/python/health on mount. Shows a banner if the backend is down.
+// ─────────────────────────────────────────────────────────────────────────────
+type BackendStatus = "checking" | "ok" | "error";
+
+function useBackendStatus(): BackendStatus {
+  const [status, setStatus] = useState<BackendStatus>("checking");
+
+  useEffect(() => {
+    let cancelled = false;
+    const check = async () => {
+      try {
+        const res = await fetch("/api/python/health", {
+          signal: AbortSignal.timeout(8000),
+        });
+        if (!cancelled) setStatus(res.ok ? "ok" : "error");
+      } catch {
+        if (!cancelled) setStatus("error");
+      }
+    };
+    check();
+    return () => { cancelled = true; };
+  }, []);
+
+  return status;
+}
+
 export const Route = createFileRoute("/ai-lab")({
   component: AILabPage,
   head: () => ({
@@ -265,11 +293,30 @@ function ScoreRing({ score, label }: { score: number; label: string }) {
 
 function AILabPage() {
   const [activeTab, setActiveTab] = useState<"portfolio" | "pdf" | "resume" | "data">("portfolio");
+  const backendStatus = useBackendStatus();
 
   return (
     <main className="bg-background text-foreground min-h-screen flex flex-col justify-between">
       <div>
         <Nav />
+
+        {/* Backend status banner */}
+        {backendStatus === "error" && (
+          <div className="bg-destructive/10 border-b border-destructive/30 px-6 py-3 flex items-center gap-3">
+            <span className="w-2 h-2 rounded-full bg-destructive shrink-0" />
+            <p className="text-xs text-destructive">
+              <strong>AI Backend Unavailable</strong> — The AI service cannot be reached right now.
+              This may be a cold-start delay on Vercel. Please wait 30 seconds and refresh the page,
+              or ensure environment variables are set in the Vercel dashboard.
+            </p>
+          </div>
+        )}
+        {backendStatus === "checking" && (
+          <div className="bg-muted/50 border-b border-border px-6 py-2.5 flex items-center gap-3">
+            <span className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse shrink-0" />
+            <p className="text-xs text-muted-foreground">Connecting to AI backend...</p>
+          </div>
+        )}
 
         {/* ── Hero Header ── */}
         <section className="pt-36 pb-16 px-6 md:px-10 border-b border-border">
@@ -391,32 +438,39 @@ function PortfolioTab() {
           data: { message: queryText.trim(), history },
         });
 
+        const hasError = !!response.error;
+        const displayText = hasError
+          ? (response.errorMessage ?? "The AI service encountered an error. Please try again.")
+          : response.answer;
+
         const assistantMsg: ChatMessage = {
           id: `assistant-${Date.now()}`,
           sender: "assistant",
-          text: response.answer,
-          citations: response.citations,
-          isStreaming: true,
-          isError: !!response.error && response.error !== "rate_limited",
+          text: displayText,
+          citations: hasError ? [] : (response.citations ?? []),
+          isStreaming: !hasError,
+          isError: hasError,
         };
 
         setMessages((prev) => [...prev, assistantMsg]);
 
-        // Remove streaming flag after animation completes
-        const duration = Math.min(response.answer.length * 8 + 500, 6000);
-        setTimeout(() => {
-          setMessages((prev) =>
-            prev.map((m) => (m.id === assistantMsg.id ? { ...m, isStreaming: false } : m)),
-          );
-        }, duration);
+        if (!hasError) {
+          // Remove streaming flag after animation completes
+          const duration = Math.min(response.answer.length * 8 + 500, 6000);
+          setTimeout(() => {
+            setMessages((prev) =>
+              prev.map((m) => (m.id === assistantMsg.id ? { ...m, isStreaming: false } : m)),
+            );
+          }, duration);
+        }
       } catch {
         setMessages((prev) => [
           ...prev,
           {
             id: `error-${Date.now()}`,
             sender: "assistant",
-            text: "Unable to reach the AI assistant. Please check your connection and try again.",
-            citations: ["System: Connection Error"],
+            text: "Cannot reach the AI backend. Please check your connection and try again.",
+            citations: [],
             isError: true,
           },
         ]);
@@ -636,32 +690,39 @@ function PdfTab() {
         },
       });
 
+      const hasError = !!response.error;
+      const displayText = hasError
+        ? (response.errorMessage ?? "The AI service encountered an error. Please try again.")
+        : response.answer;
+
       const assistantMsg: ChatMessage = {
         id: `assistant-${Date.now()}`,
         sender: "assistant",
-        text: response.answer,
-        pageRef: response.pageRef,
-        citations: response.citations,
-        isStreaming: true,
-        isError: !!response.error,
+        text: displayText,
+        pageRef: hasError ? "" : response.pageRef,
+        citations: hasError ? [] : response.citations,
+        isStreaming: !hasError,
+        isError: hasError,
       };
 
       setMessages((prev) => [...prev, assistantMsg]);
 
-      const duration = Math.min(response.answer.length * 8 + 500, 6000);
-      setTimeout(() => {
-        setMessages((prev) =>
-          prev.map((m) => (m.id === assistantMsg.id ? { ...m, isStreaming: false } : m)),
-        );
-      }, duration);
+      if (!hasError) {
+        const duration = Math.min(response.answer.length * 8 + 500, 6000);
+        setTimeout(() => {
+          setMessages((prev) =>
+            prev.map((m) => (m.id === assistantMsg.id ? { ...m, isStreaming: false } : m)),
+          );
+        }, duration);
+      }
     } catch {
       setMessages((prev) => [
         ...prev,
         {
           id: `error-${Date.now()}`,
           sender: "assistant",
-          text: "Unable to reach the PDF Chat service. Please try again.",
-          citations: ["System: Connection Error"],
+          text: "Cannot reach the AI backend. Please check your connection and try again.",
+          citations: [],
           isError: true,
         },
       ]);
@@ -1276,29 +1337,36 @@ function DataAnalystTab() {
         data: { message: queryText.trim(), csvContext, history },
       });
 
+      const hasError = !!response.error;
+      const displayText = hasError
+        ? (response.errorMessage ?? "The AI service encountered an error. Please try again.")
+        : response.answer;
+
       const assistantMsg: ChatMessage = {
         id: `assistant-${Date.now()}`,
         sender: "assistant",
-        text: response.answer,
-        isStreaming: true,
-        isError: !!response.error,
+        text: displayText,
+        isStreaming: !hasError,
+        isError: hasError,
       };
 
       setMessages((prev) => [...prev, assistantMsg]);
 
-      const duration = Math.min(response.answer.length * 8 + 500, 6000);
-      setTimeout(() => {
-        setMessages((prev) =>
-          prev.map((m) => (m.id === assistantMsg.id ? { ...m, isStreaming: false } : m)),
-        );
-      }, duration);
+      if (!hasError) {
+        const duration = Math.min(response.answer.length * 8 + 500, 6000);
+        setTimeout(() => {
+          setMessages((prev) =>
+            prev.map((m) => (m.id === assistantMsg.id ? { ...m, isStreaming: false } : m)),
+          );
+        }, duration);
+      }
     } catch {
       setMessages((prev) => [
         ...prev,
         {
           id: `error-${Date.now()}`,
           sender: "assistant",
-          text: "Unable to reach the AI Analyst. Please check your connection.",
+          text: "Cannot reach the AI backend. Please check your connection and try again.",
           isError: true,
         },
       ]);
