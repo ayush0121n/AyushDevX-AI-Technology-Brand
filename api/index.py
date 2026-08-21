@@ -50,6 +50,42 @@ async def health():
     }
 
 
+@app.get("/api/python/debug")
+def debug():
+    """Diagnostic endpoint: tries a minimal Groq call and returns raw error details."""
+    api_key = os.environ.get("GROQ_API_KEY", "").strip()
+    if not api_key:
+        return {"ok": False, "error": "No GROQ_API_KEY set"}
+    try:
+        with httpx.Client(timeout=15.0, verify=True) as client:
+            resp = client.post(
+                "https://api.groq.com/openai/v1/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": "llama-3.1-8b-instant",
+                    "messages": [{"role": "user", "content": "Say OK"}],
+                    "max_tokens": 5,
+                    "temperature": 0,
+                    "stream": False,
+                },
+            )
+        return {
+            "ok": resp.is_success,
+            "status_code": resp.status_code,
+            "body_preview": resp.text[:500],
+        }
+    except Exception as e:
+        return {
+            "ok": False,
+            "exception_type": type(e).__name__,
+            "exception_msg": str(e),
+            "traceback": traceback.format_exc(),
+        }
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Groq API Key Helper
 # ─────────────────────────────────────────────────────────────────────────────
@@ -68,12 +104,12 @@ def get_groq_api_key() -> str:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Direct Groq REST API Call — replaces the Groq Python SDK.
-# The SDK's httpx client has SSL/connection init issues in Vercel serverless.
-# Using a fresh AsyncClient per request is reliable in stateless environments.
+# Direct Groq REST API Call — synchronous httpx.Client
+# Vercel Python serverless + Mangum has async event loop lifecycle issues.
+# Synchronous httpx.Client per request is the reliable pattern here.
 # ─────────────────────────────────────────────────────────────────────────────
 
-async def call_groq(
+def call_groq(
     api_key: str,
     model: str,
     messages: list,
@@ -82,6 +118,11 @@ async def call_groq(
     json_mode: bool = False,
     timeout: float = 28.0,
 ) -> str:
+    """
+    Synchronous Groq REST API call via httpx.Client.
+    Synchronous is required for reliability in Vercel's Python serverless runtime
+    (async event loops are unstable across cold starts with Mangum).
+    """
     payload: dict = {
         "model": model,
         "messages": messages,
@@ -92,8 +133,8 @@ async def call_groq(
     if json_mode:
         payload["response_format"] = {"type": "json_object"}
 
-    async with httpx.AsyncClient(timeout=timeout, verify=True) as client:
-        resp = await client.post(
+    with httpx.Client(timeout=timeout, verify=True) as client:
+        resp = client.post(
             GROQ_API_URL,
             headers={
                 "Authorization": f"Bearer {api_key}",
@@ -144,7 +185,7 @@ class DataAnalystRequest(BaseModel):
     history: Optional[List[dict]] = []
 
 @app.post("/api/python/data_analyst")
-async def analyze_data(req: DataAnalystRequest):
+def analyze_data(req: DataAnalystRequest):
     api_key = get_groq_api_key()
     try:
         # Limit CSV context to avoid token overload
@@ -177,7 +218,7 @@ async def analyze_data(req: DataAnalystRequest):
             messages.append({"role": m.get("role", "user"), "content": str(m.get("content", ""))[:400]})
         messages.append({"role": "user", "content": req.message[:800]})
 
-        answer = await call_groq(
+        answer = call_groq(
             api_key=api_key,
             model="llama-3.1-8b-instant",
             messages=messages,
@@ -203,7 +244,7 @@ class AtsRequest(BaseModel):
     jobText: str
 
 @app.post("/api/python/ats_matcher")
-async def analyze_ats(req: AtsRequest):
+def analyze_ats(req: AtsRequest):
     api_key = get_groq_api_key()
     try:
         system_prompt = """You are an expert ATS (Applicant Tracking System) resume analyzer.
@@ -226,7 +267,7 @@ Be highly accurate. Do not fabricate matches."""
         job_trimmed = req.jobText[:1500]
         user_prompt = f"RESUME:\n{resume_trimmed}\n\nJOB DESCRIPTION:\n{job_trimmed}\n\nAnalyze and return JSON."
 
-        answer = await call_groq(
+        answer = call_groq(
             api_key=api_key,
             model="llama-3.1-8b-instant",
             messages=[
@@ -258,7 +299,7 @@ class PdfChatRequest(BaseModel):
     customContent: Optional[str] = None
 
 @app.post("/api/python/pdf_chat")
-async def chat_pdf(req: PdfChatRequest):
+def chat_pdf(req: PdfChatRequest):
     api_key = get_groq_api_key()
     try:
         doc_content = req.customContent if req.customContent else f"Document: {req.documentId}"
@@ -276,7 +317,7 @@ async def chat_pdf(req: PdfChatRequest):
             messages.append({"role": m.get("role", "user"), "content": str(m.get("content", ""))[:400]})
         messages.append({"role": "user", "content": req.message[:600]})
 
-        text = await call_groq(
+        text = call_groq(
             api_key=api_key,
             model="llama-3.1-8b-instant",
             messages=messages,
@@ -314,7 +355,7 @@ class PdfUploadRequest(BaseModel):
     base64Data: str
 
 @app.post("/api/python/extract_pdf")
-async def extract_pdf(req: PdfUploadRequest):
+def extract_pdf(req: PdfUploadRequest):
     try:
         pdf_bytes = base64.b64decode(req.base64Data)
         pdf_file = io.BytesIO(pdf_bytes)
@@ -342,7 +383,7 @@ class PortfolioRequest(BaseModel):
     history: Optional[List[dict]] = []
 
 @app.post("/api/python/portfolio")
-async def chat_portfolio(req: PortfolioRequest):
+def chat_portfolio(req: PortfolioRequest):
     api_key = get_groq_api_key()
     try:
         system_prompt = """You are the AyushDevX AI Portfolio Assistant — a precise, technically grounded assistant for the AyushDevX brand.
@@ -417,7 +458,7 @@ async def chat_portfolio(req: PortfolioRequest):
             messages.append({"role": m.get("role", "user"), "content": str(m.get("content", ""))[:500]})
         messages.append({"role": "user", "content": req.message[:600]})
 
-        answer = await call_groq(
+        answer = call_groq(
             api_key=api_key,
             model="llama-3.1-8b-instant",
             messages=messages,
