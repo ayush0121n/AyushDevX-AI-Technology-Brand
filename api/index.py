@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
 import pandas as pd
@@ -8,37 +9,130 @@ import re
 import json
 import base64
 import traceback
-from groq import Groq
+import httpx
 import PyPDF2
+from mangum import Mangum
+
+# ─────────────────────────────────────────────────────────────────────────────
+# App Setup
+# ─────────────────────────────────────────────────────────────────────────────
 
 app = FastAPI(docs_url="/api/python/docs", openapi_url="/api/python/openapi.json")
 
-# Load .env.local for local development if it exists
-env_path = os.path.join(os.path.dirname(__file__), '..', '.env.local')
-if os.path.exists(env_path):
-    with open(env_path, 'r', encoding='utf-8') as f:
-        for line in f:
-            line = line.strip()
-            if '=' in line and not line.startswith('#'):
-                key, val = line.split('=', 1)
-                os.environ[key.strip()] = val.strip()
+# CORS — allow requests from the SPA (same origin on Vercel, localhost in dev)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Vercel SPA is same-origin; this also allows local dev
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
+)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Mangum Handler — Required for Vercel Python Serverless Functions
+# lifespan="off" avoids startup/shutdown event issues in serverless context
+# ─────────────────────────────────────────────────────────────────────────────
+handler = Mangum(app, lifespan="off")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Health Check
+# ─────────────────────────────────────────────────────────────────────────────
 
 @app.get("/api/python/health")
 async def health():
-    groq_key = os.environ.get("GROQ_API_KEY")
+    groq_key = os.environ.get("GROQ_API_KEY", "")
     return {
         "status": "ok",
         "groq_key_set": bool(groq_key),
-        "groq_key_prefix": groq_key[:8] + "..." if groq_key else None,
+        "groq_key_prefix": (groq_key[:8] + "...") if groq_key else None,
         "python_version": __import__("sys").version,
     }
 
 
-def get_groq_client() -> Groq:
-    api_key = os.environ.get("GROQ_API_KEY")
+# ─────────────────────────────────────────────────────────────────────────────
+# Groq API Key Helper
+# ─────────────────────────────────────────────────────────────────────────────
+
+GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
+
+
+def get_groq_api_key() -> str:
+    api_key = os.environ.get("GROQ_API_KEY", "").strip()
     if not api_key:
-        raise HTTPException(status_code=500, detail="Missing GROQ_API_KEY environment variable.")
-    return Groq(api_key=api_key)
+        raise HTTPException(
+            status_code=503,
+            detail="AI service is temporarily unavailable. Please try again later.",
+        )
+    return api_key
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Direct Groq REST API Call — replaces the Groq Python SDK.
+# The SDK's httpx client has SSL/connection init issues in Vercel serverless.
+# Using a fresh AsyncClient per request is reliable in stateless environments.
+# ─────────────────────────────────────────────────────────────────────────────
+
+async def call_groq(
+    api_key: str,
+    model: str,
+    messages: list,
+    max_tokens: int = 800,
+    temperature: float = 0.3,
+    json_mode: bool = False,
+    timeout: float = 28.0,
+) -> str:
+    payload: dict = {
+        "model": model,
+        "messages": messages,
+        "max_tokens": max_tokens,
+        "temperature": temperature,
+        "stream": False,
+    }
+    if json_mode:
+        payload["response_format"] = {"type": "json_object"}
+
+    async with httpx.AsyncClient(timeout=timeout, verify=True) as client:
+        resp = await client.post(
+            GROQ_API_URL,
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            json=payload,
+        )
+
+    if resp.status_code == 429:
+        raise RuntimeError("rate_limit: The AI service is busy right now.")
+    if resp.status_code in (401, 403):
+        raise RuntimeError("auth_error: AI service authentication error.")
+    if resp.status_code >= 500:
+        raise RuntimeError(f"server_error: Groq returned {resp.status_code}.")
+    if not resp.is_success:
+        raise RuntimeError(f"api_error: Groq returned {resp.status_code}.")
+
+    data = resp.json()
+    return data["choices"][0]["message"]["content"] or ""
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Shared friendly error mapper
+# ─────────────────────────────────────────────────────────────────────────────
+
+def friendly_error(e: Exception) -> str:
+    msg = str(e).lower()
+    if "rate_limit" in msg or "429" in msg or "rate limit" in msg:
+        return "The AI service is busy right now. Please wait 30 seconds and try again."
+    if "tokens" in msg and ("limit" in msg or "exceed" in msg):
+        return "Your input is too long. Please shorten your text and try again."
+    if "401" in msg or "403" in msg or "authentication" in msg or "auth_error" in msg:
+        return "AI service authentication error. Please contact support."
+    if "timeout" in msg or "timed out" in msg:
+        return "The AI request timed out. Please try again with a shorter input."
+    if "connection" in msg or "connect" in msg:
+        return "Cannot connect to AI service. Please try again in a moment."
+    return "AI service encountered an error. Please try again in a moment."
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Data Analyst
@@ -51,56 +145,53 @@ class DataAnalystRequest(BaseModel):
 
 @app.post("/api/python/data_analyst")
 async def analyze_data(req: DataAnalystRequest):
-    client = get_groq_client()
+    api_key = get_groq_api_key()
     try:
-        csv_buffer = io.StringIO(req.csvContext)
+        # Limit CSV context to avoid token overload
+        csv_sample = req.csvContext[:2000]
+        csv_buffer = io.StringIO(req.csvContext[:5000])
         df = pd.read_csv(csv_buffer)
 
-        stats = df.describe(include='all').to_string()
+        # Trim stats to avoid token overload — use only numeric summary
+        numeric_df = df.select_dtypes(include="number")
+        stats = numeric_df.describe().to_string() if not numeric_df.empty else "No numeric columns."
         columns = ", ".join(df.columns.tolist())
         row_count = len(df)
         col_count = len(df.columns)
 
         exact_insights = (
-            f"Dataset Dimensions: {row_count} rows, {col_count} columns.\n"
-            f"Columns: {columns}\n\nStatistical Summary:\n{stats}"
+            f"Dataset: {row_count} rows × {col_count} columns.\n"
+            f"Columns: {columns}\n\nNumeric Summary:\n{stats}"
         )
 
-        system_prompt = f"""You are an expert Data Scientist and AI Data Analyst.
-You are analyzing a dataset with EXACT pandas statistics computed below.
-Base all factual numbers on the exact statistics provided.
-
---- EXACT PANDAS STATISTICS ---
-{exact_insights}
--------------------------------
-
---- RAW DATA SAMPLE ---
-{req.csvContext[:3000]}
------------------------
-
-Answer the user's questions concisely. Use markdown tables or bullet points where helpful.
-Do not hallucinate data."""
+        system_prompt = (
+            "You are a Data Analyst. Answer the user's question about their dataset concisely.\n\n"
+            f"--- DATASET STATS ---\n{exact_insights}\n\n"
+            f"--- DATA SAMPLE (first 2000 chars) ---\n{csv_sample}\n"
+            "Use markdown tables or bullet points where helpful. Do not hallucinate data."
+        )
 
         messages = [{"role": "system", "content": system_prompt}]
-        for m in (req.history or []):
-            messages.append({"role": m.get("role", "user"), "content": m.get("content", "")})
-        messages.append({"role": "user", "content": req.message})
+        # Only keep last 4 history turns to save tokens
+        for m in (req.history or [])[-4:]:
+            messages.append({"role": m.get("role", "user"), "content": str(m.get("content", ""))[:400]})
+        messages.append({"role": "user", "content": req.message[:800]})
 
-        completion = client.chat.completions.create(
+        answer = await call_groq(
+            api_key=api_key,
             model="llama-3.1-8b-instant",
             messages=messages,
+            max_tokens=800,
             temperature=0.1,
-            max_tokens=1500,
         )
-        answer = completion.choices[0].message.content or "No response generated."
-        return {"answer": answer, "error": None}
+        return {"answer": answer or "No response generated.", "error": None}
 
     except HTTPException:
         raise
     except Exception as e:
         tb = traceback.format_exc()
-        print(f"Error in data_analyst:\n{tb}")
-        return {"answer": "", "error": str(e)}
+        print(f"[data_analyst] Error:\n{tb}")
+        return {"answer": "", "error": friendly_error(e)}
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -113,7 +204,7 @@ class AtsRequest(BaseModel):
 
 @app.post("/api/python/ats_matcher")
 async def analyze_ats(req: AtsRequest):
-    client = get_groq_client()
+    api_key = get_groq_api_key()
     try:
         system_prompt = """You are an expert ATS (Applicant Tracking System) resume analyzer.
 Analyze the resume against the job description and return a structured JSON analysis.
@@ -130,27 +221,30 @@ CRITICAL: Return ONLY a valid JSON object matching exactly this schema:
 
 Be highly accurate. Do not fabricate matches."""
 
-        user_prompt = f"RESUME:\n{req.resumeText}\n\nJOB DESCRIPTION:\n{req.jobText}\n\nAnalyze and return JSON."
+        # Trim inputs to avoid token overload
+        resume_trimmed = req.resumeText[:2500]
+        job_trimmed = req.jobText[:1500]
+        user_prompt = f"RESUME:\n{resume_trimmed}\n\nJOB DESCRIPTION:\n{job_trimmed}\n\nAnalyze and return JSON."
 
-        completion = client.chat.completions.create(
+        answer = await call_groq(
+            api_key=api_key,
             model="llama-3.1-8b-instant",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
             ],
+            max_tokens=800,
             temperature=0.1,
-            max_tokens=1000,
-            response_format={"type": "json_object"},
+            json_mode=True,
         )
-        answer = completion.choices[0].message.content
         return {"result": json.loads(answer)}
 
     except HTTPException:
         raise
     except Exception as e:
         tb = traceback.format_exc()
-        print(f"Error in ats_matcher:\n{tb}")
-        return {"error": str(e)}
+        print(f"[ats_matcher] Error:\n{tb}")
+        return {"error": friendly_error(e)}
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -165,30 +259,30 @@ class PdfChatRequest(BaseModel):
 
 @app.post("/api/python/pdf_chat")
 async def chat_pdf(req: PdfChatRequest):
-    client = get_groq_client()
+    api_key = get_groq_api_key()
     try:
         doc_content = req.customContent if req.customContent else f"Document: {req.documentId}"
 
-        system_prompt = f"""You are an AI Document Reader analyzing: {req.documentId}.
-
-Document content:
-{doc_content[:6000]}
-
-Answer the user's questions accurately based only on the document context above.
-At the end of your answer, include: PAGE_REF: [page number or section]"""
+        system_prompt = (
+            f"You are an AI Document Reader analyzing: {req.documentId}.\n\n"
+            f"Document content:\n{doc_content[:4000]}\n\n"
+            "Answer the user's questions accurately based only on the document context above. "
+            "At the end of your answer, include: PAGE_REF: [page number or section]"
+        )
 
         messages = [{"role": "system", "content": system_prompt}]
-        for m in (req.history or []):
-            messages.append({"role": m.get("role", "user"), "content": m.get("content", "")})
-        messages.append({"role": "user", "content": req.message})
+        # Only keep last 4 history turns
+        for m in (req.history or [])[-4:]:
+            messages.append({"role": m.get("role", "user"), "content": str(m.get("content", ""))[:400]})
+        messages.append({"role": "user", "content": req.message[:600]})
 
-        completion = client.chat.completions.create(
+        text = await call_groq(
+            api_key=api_key,
             model="llama-3.1-8b-instant",
             messages=messages,
+            max_tokens=700,
             temperature=0.2,
-            max_tokens=1000,
         )
-        text = completion.choices[0].message.content or ""
 
         page_ref_match = re.search(r'\nPAGE_REF:\s*(.+)$', text, re.MULTILINE)
         page_ref = page_ref_match.group(1).strip() if page_ref_match else ""
@@ -207,8 +301,8 @@ At the end of your answer, include: PAGE_REF: [page number or section]"""
         raise
     except Exception as e:
         tb = traceback.format_exc()
-        print(f"Error in pdf_chat:\n{tb}")
-        return {"error": str(e), "answer": "", "pageRef": "", "citations": []}
+        print(f"[pdf_chat] Error:\n{tb}")
+        return {"error": friendly_error(e), "answer": "", "pageRef": "", "citations": []}
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -235,8 +329,8 @@ async def extract_pdf(req: PdfUploadRequest):
 
     except Exception as e:
         tb = traceback.format_exc()
-        print(f"Error extracting PDF:\n{tb}")
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"[extract_pdf] Error:\n{tb}")
+        raise HTTPException(status_code=500, detail=friendly_error(e))
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -249,7 +343,7 @@ class PortfolioRequest(BaseModel):
 
 @app.post("/api/python/portfolio")
 async def chat_portfolio(req: PortfolioRequest):
-    client = get_groq_client()
+    api_key = get_groq_api_key()
     try:
         system_prompt = """You are the AyushDevX AI Portfolio Assistant — a precise, technically grounded assistant for the AyushDevX brand.
 
@@ -318,17 +412,18 @@ async def chat_portfolio(req: PortfolioRequest):
 - Do NOT reveal that you are built on Groq or any LLM — respond as the AyushDevX Assistant."""
 
         messages = [{"role": "system", "content": system_prompt}]
-        for m in (req.history or []):
-            messages.append({"role": m.get("role", "user"), "content": m.get("content", "")})
-        messages.append({"role": "user", "content": req.message})
+        # Only keep last 6 history turns
+        for m in (req.history or [])[-6:]:
+            messages.append({"role": m.get("role", "user"), "content": str(m.get("content", ""))[:500]})
+        messages.append({"role": "user", "content": req.message[:600]})
 
-        completion = client.chat.completions.create(
+        answer = await call_groq(
+            api_key=api_key,
             model="llama-3.1-8b-instant",
             messages=messages,
-            temperature=0.3,
             max_tokens=400,
+            temperature=0.3,
         )
-        answer = completion.choices[0].message.content or ""
 
         lower = (req.message + " " + answer).lower()
         citations = []
@@ -358,5 +453,5 @@ async def chat_portfolio(req: PortfolioRequest):
         raise
     except Exception as e:
         tb = traceback.format_exc()
-        print(f"Error in portfolio assistant:\n{tb}")
-        return {"error": str(e), "answer": "", "citations": []}
+        print(f"[portfolio] Error:\n{tb}")
+        return {"error": friendly_error(e), "answer": "", "citations": []}
