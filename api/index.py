@@ -65,7 +65,7 @@ def debug():
                     "Content-Type": "application/json",
                 },
                 json={
-                    "model": "llama-3.1-8b-instant",
+                    "model": "groq/compound-mini",
                     "messages": [{"role": "user", "content": "Say OK"}],
                     "max_tokens": 5,
                     "temperature": 0,
@@ -220,7 +220,7 @@ def analyze_data(req: DataAnalystRequest):
 
         answer = call_groq(
             api_key=api_key,
-            model="llama-3.1-8b-instant",
+            model="groq/compound-mini",
             messages=messages,
             max_tokens=800,
             temperature=0.1,
@@ -269,7 +269,7 @@ Be highly accurate. Do not fabricate matches."""
 
         answer = call_groq(
             api_key=api_key,
-            model="llama-3.1-8b-instant",
+            model="groq/compound-mini",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
@@ -319,7 +319,7 @@ def chat_pdf(req: PdfChatRequest):
 
         text = call_groq(
             api_key=api_key,
-            model="llama-3.1-8b-instant",
+            model="groq/compound-mini",
             messages=messages,
             max_tokens=700,
             temperature=0.2,
@@ -460,7 +460,7 @@ def chat_portfolio(req: PortfolioRequest):
 
         answer = call_groq(
             api_key=api_key,
-            model="llama-3.1-8b-instant",
+            model="groq/compound-mini",
             messages=messages,
             max_tokens=400,
             temperature=0.3,
