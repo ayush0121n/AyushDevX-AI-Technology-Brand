@@ -65,7 +65,7 @@ def debug():
                     "Content-Type": "application/json",
                 },
                 json={
-                    "model": "qwen/qwen3.6-27b",
+                    "model": "qwen/qwen3.8-27b",
                     "messages": [{"role": "user", "content": "Say OK"}],
                     "max_tokens": 20,
                     "temperature": 0,
@@ -228,7 +228,7 @@ def analyze_data(req: DataAnalystRequest):
 
         answer = call_groq(
             api_key=api_key,
-            model="qwen/qwen3.6-27b",
+            model="qwen/qwen3.8-27b",
             messages=messages,
             max_tokens=800,
             temperature=0.1,
@@ -277,7 +277,7 @@ Be highly accurate. Do not fabricate matches."""
 
         answer = call_groq(
             api_key=api_key,
-            model="qwen/qwen3.6-27b",
+            model="qwen/qwen3.8-27b",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
@@ -327,7 +327,7 @@ def chat_pdf(req: PdfChatRequest):
 
         text = call_groq(
             api_key=api_key,
-            model="qwen/qwen3.6-27b",
+            model="qwen/qwen3.8-27b",
             messages=messages,
             max_tokens=700,
             temperature=0.2,
@@ -468,7 +468,7 @@ def chat_portfolio(req: PortfolioRequest):
 
         answer = call_groq(
             api_key=api_key,
-            model="qwen/qwen3.6-27b",
+            model="qwen/qwen3.8-27b",
             messages=messages,
             max_tokens=400,
             temperature=0.3,

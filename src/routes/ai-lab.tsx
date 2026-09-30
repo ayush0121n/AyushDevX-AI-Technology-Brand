@@ -495,7 +495,7 @@ function PortfolioTab() {
         <div className="lg:col-span-5 space-y-6">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-flame/10 text-flame border border-flame/20 text-xs uppercase tracking-[0.2em]">
             <span className="w-2 h-2 rounded-full bg-flame animate-pulse" />
-            RAG Assistant · Groq Llama 3.1
+            RAG Assistant · Groq Qwen 3.8
           </div>
           <h2 className="font-display text-3xl md:text-4xl">Portfolio Assistant</h2>
           <p className="text-sm text-muted-foreground leading-relaxed">
@@ -523,7 +523,7 @@ function PortfolioTab() {
 
           {/* Disclaimer */}
           <div className="text-[0.65rem] text-muted-foreground/60 leading-relaxed border-t border-border/50 pt-4">
-            ⚡ Powered by Groq (llama-3.1-8b-instant) · Server-side only · Zero data retention
+            ⚡ Powered by Groq (qwen3.8-27b) · Server-side only · Zero data retention
           </div>
         </div>
 
@@ -744,7 +744,7 @@ function PdfTab() {
         <div className="lg:col-span-5 space-y-6">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-flame/10 text-flame border border-flame/20 text-xs uppercase tracking-[0.2em]">
             <span className="w-2 h-2 rounded-full bg-flame animate-pulse" />
-            PDF Vector Workspace · Groq Llama 3.1
+            PDF Vector Workspace · Groq Qwen 3.8
           </div>
           <h2 className="font-display text-3xl md:text-4xl">Document RAG Reader</h2>
           <p className="text-sm text-muted-foreground leading-relaxed">
@@ -1187,7 +1187,7 @@ function ResumeTab() {
                   <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground block">
                     Powered by
                   </span>
-                  <span className="text-xs font-mono text-flame">Groq / Llama 3.3 70B</span>
+                  <span className="text-xs font-mono text-flame">Groq / Qwen 3.8 27B</span>
                 </div>
               </div>
 
@@ -1387,7 +1387,7 @@ function DataAnalystTab() {
         <div className="lg:col-span-5 space-y-6">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-flame/10 text-flame border border-flame/20 text-xs uppercase tracking-[0.2em]">
             <span className="w-2 h-2 rounded-full bg-flame animate-pulse" />
-            No-Code EDA · Groq Llama 3.1
+            No-Code EDA · Groq Qwen 3.8
           </div>
           <h2 className="font-display text-3xl md:text-4xl">Data Analyst Studio</h2>
           <p className="text-sm text-muted-foreground leading-relaxed">
