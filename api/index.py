@@ -2,7 +2,6 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
-import pandas as pd
 import io
 import os
 import re
@@ -11,6 +10,7 @@ import base64
 import traceback
 import httpx
 import PyPDF2
+import csv
 from mangum import Mangum
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -199,15 +199,17 @@ def analyze_data(req: DataAnalystRequest):
         # Limit CSV context to avoid token overload
         csv_sample = req.csvContext[:2000]
         csv_buffer = io.StringIO(req.csvContext[:5000])
-        df = pd.read_csv(csv_buffer)
-
-        # Trim stats to avoid token overload — use only numeric summary
-        numeric_df = df.select_dtypes(include="number")
-        stats = numeric_df.describe().to_string() if not numeric_df.empty else "No numeric columns."
-        columns = ", ".join(df.columns.tolist())
-        row_count = len(df)
-        col_count = len(df.columns)
-
+        reader = csv.reader(csv_buffer)
+        
+        headers = next(reader, [])
+        columns = ", ".join(headers)
+        
+        rows = list(reader)
+        row_count = len(rows)
+        col_count = len(headers)
+        
+        # Simple numeric summary approximation
+        stats = "Summary not available without pandas."
         exact_insights = (
             f"Dataset: {row_count} rows × {col_count} columns.\n"
             f"Columns: {columns}\n\nNumeric Summary:\n{stats}"
