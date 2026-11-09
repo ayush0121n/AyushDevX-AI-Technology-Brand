@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AiLabRouteImport } from './routes/ai-lab'
+import { Route as CertificatesRouteImport } from './routes/certificates'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as KnowledgeHubRouteImport } from './routes/knowledge-hub'
@@ -40,6 +41,11 @@ const AdminRoute = AdminRouteImport.update({
 const AiLabRoute = AiLabRouteImport.update({
   id: '/ai-lab',
   path: '/ai-lab',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CertificatesRoute = CertificatesRouteImport.update({
+  id: '/certificates',
+  path: '/certificates',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -88,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/ai-lab': typeof AiLabRoute
+  '/certificates': typeof CertificatesRoute
   '/contact': typeof ContactRoute
   '/insights': typeof InsightsRoute
   '/knowledge-hub': typeof KnowledgeHubRouteWithChildren
@@ -101,6 +108,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/ai-lab': typeof AiLabRoute
+  '/certificates': typeof CertificatesRoute
   '/contact': typeof ContactRoute
   '/insights': typeof InsightsRoute
   '/knowledge-hub': typeof KnowledgeHubRouteWithChildren
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/ai-lab': typeof AiLabRoute
+  '/certificates': typeof CertificatesRoute
   '/contact': typeof ContactRoute
   '/insights': typeof InsightsRoute
   '/knowledge-hub': typeof KnowledgeHubRouteWithChildren
@@ -132,6 +141,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/ai-lab'
+    | '/certificates'
     | '/contact'
     | '/insights'
     | '/knowledge-hub'
@@ -145,6 +155,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/ai-lab'
+    | '/certificates'
     | '/contact'
     | '/insights'
     | '/knowledge-hub'
@@ -159,6 +170,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/ai-lab'
+    | '/certificates'
     | '/contact'
     | '/insights'
     | '/knowledge-hub'
@@ -174,6 +186,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
   AiLabRoute: typeof AiLabRoute
+  CertificatesRoute: typeof CertificatesRoute
   ContactRoute: typeof ContactRoute
   InsightsRoute: typeof InsightsRoute
   KnowledgeHubRoute: typeof KnowledgeHubRouteWithChildren
@@ -209,6 +222,13 @@ declare module '@tanstack/react-router' {
       path: '/ai-lab'
       fullPath: '/ai-lab'
       preLoaderRoute: typeof AiLabRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/certificates': {
+      id: '/certificates'
+      path: '/certificates'
+      fullPath: '/certificates'
+      preLoaderRoute: typeof CertificatesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -299,6 +319,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
   AiLabRoute: AiLabRoute,
+  CertificatesRoute: CertificatesRoute,
   ContactRoute: ContactRoute,
   InsightsRoute: InsightsRoute,
   KnowledgeHubRoute: KnowledgeHubRouteWithChildren,

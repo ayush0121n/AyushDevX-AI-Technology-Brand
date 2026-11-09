@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { Magnetic } from "@/components/site/Magnetic";
+import { useProducts, ProductItem } from "@/data/productsData";
+import { Sparkles, ArrowRight, ExternalLink, Code2 } from "lucide-react";
 
 export const Route = createFileRoute("/products")({
   component: ProductsPage,
@@ -19,118 +21,9 @@ export const Route = createFileRoute("/products")({
   }),
 });
 
-interface ProductItem {
-  id: string;
-  name: string;
-  tagline: string;
-  description: string;
-  features: string[];
-  status: "published" | "coming_soon" | "draft";
-  badge: string;
-  demoUrl?: string;
-}
-
-const products: ProductItem[] = [
-  {
-    id: "ai-portfolio-assistant",
-    name: "AI Portfolio Assistant",
-    tagline: "RAG-Powered Conversational Knowledge Engine",
-    description:
-      "Interactive AI assistant trained on AyushDevX documentation, engineering specifications, and technical projects.",
-    features: [
-      "Retrieval-Augmented Generation (RAG)",
-      "Zero hallucination fallback to verified docs",
-      "Real-time streaming token responses",
-      "Contextual source citations",
-    ],
-    status: "published",
-    badge: "Live Beta",
-    demoUrl: "/ai-lab",
-  },
-  {
-    id: "ai-pdf-chat",
-    name: "AI PDF Chat & RAG Studio",
-    tagline: "Chat with Technical PDF Documents & Research Papers",
-    description:
-      "Upload PDF research papers, technical specs, or manuals and ask natural language questions with exact page references.",
-    features: [
-      "Client-side PDF text extraction",
-      "Local vector similarity search",
-      "Page number citations",
-      "Privacy-first file handling",
-    ],
-    status: "published",
-    badge: "Live Beta",
-    demoUrl: "/ai-lab",
-  },
-  {
-    id: "ai-resume-analyzer",
-    name: "AI Resume & ATS Analyzer",
-    tagline: "Intelligent Job Fit & Keyword Optimization Engine",
-    description:
-      "Compare resumes against job descriptions to evaluate ATS compatibility, uncover skill gaps, and receive actionable rewrites.",
-    features: [
-      "ATS keyword match scoring",
-      "Skill gap identification",
-      "Action verb optimization",
-      "Custom cover letter draft generation",
-    ],
-    status: "published",
-    badge: "Live Beta",
-    demoUrl: "/ai-lab",
-  },
-  {
-    id: "ai-data-analyst",
-    name: "AI Data Analyst Studio",
-    tagline: "Natural Language EDA for CSV Datasets",
-    description:
-      "Upload tabular CSV datasets and explore statistical distributions, outliers, and charts using plain English prompts.",
-    features: [
-      "Automated Exploratory Data Analysis",
-      "Instant statistical summaries",
-      "Data quality audit reports",
-      "No-code SQL query generation",
-    ],
-    status: "published",
-    badge: "Live Beta",
-    demoUrl: "/ai-lab",
-  },
-  {
-    id: "ai-code-reviewer",
-    name: "AI Code Reviewer",
-    tagline: "Automated Security & Performance Code Analysis",
-    description:
-      "Analyze TypeScript and Python code snippets for anti-patterns, security risks, and Supabase PostgreSQL best practices.",
-    features: [
-      "PostgreSQL & RLS security check",
-      "TypeScript type safety audit",
-      "Performance optimization tips",
-      "Clean code refactor suggestions",
-    ],
-    status: "coming_soon",
-    badge: "Planned Q3",
-  },
-  {
-    id: "ai-interview-simulator",
-    name: "AI Interview Simulator",
-    tagline: "Interactive Technical & Architectural Interviewer",
-    description:
-      "Practice full-stack, machine learning, and system design interviews with real-time feedback on clarity and depth.",
-    features: [
-      "System design scenarios",
-      "Machine learning theory probes",
-      "Real-time communication scoring",
-      "Actionable improvement feedback",
-    ],
-    status: "coming_soon",
-    badge: "Planned Q4",
-  },
-];
-
 function ProductsPage() {
-  const [filter, setFilter] = useState<"all" | "published" | "coming_soon">(
-    "all",
-  );
+  const { products } = useProducts();
+  const [filter, setFilter] = useState<"all" | "published" | "coming_soon">("all");
 
   const filteredProducts =
     filter === "all" ? products : products.filter((p) => p.status === filter);
@@ -144,15 +37,14 @@ function ProductsPage() {
         <section className="pt-36 pb-16 px-6 md:px-10 border-b border-border">
           <div className="max-w-6xl">
             <span className="text-xs uppercase tracking-[0.25em] text-flame block mb-4">
-              (02 / Products)
+              (02 / Products & Solutions)
             </span>
             <h1 className="font-display text-[clamp(2.8rem,7vw,7.5rem)] leading-[0.9] tracking-tight">
-              Intelligent <br />
-              <span className="text-flame italic">AI tools & studio.</span>
+              Interactive <br />
+              <span className="text-flame italic">AI Lab tools & products.</span>
             </h1>
-            <p className="mt-6 text-sm md:text-base text-muted-foreground max-w-2xl">
-              Production-grade AI tools, RAG knowledge engines, and developer
-              products engineered for speed, accuracy, and accessibility.
+            <p className="mt-6 text-sm md:text-base text-muted-foreground max-w-2xl font-sans">
+              Live interactive AI tools and product studio applications powered by Groq LLM and vector RAG — including our Portfolio Assistant, PDF Document Chat, ATS Resume Matcher, and No-Code Data Analyst.
             </p>
 
             {/* Status Filter */}
@@ -160,14 +52,12 @@ function ProductsPage() {
               {[
                 { key: "all", label: "All Products" },
                 { key: "published", label: "Available Now" },
-                { key: "coming_soon", label: "Roadmap / Coming Soon" },
+                { key: "coming_soon", label: "Roadmap / In Progress" },
               ].map((tab) => (
                 <button
                   key={tab.key}
-                  onClick={() =>
-                    setFilter(tab.key as "all" | "published" | "coming_soon")
-                  }
-                  className={`px-4 py-2 text-xs uppercase tracking-[0.2em] border transition-colors ${
+                  onClick={() => setFilter(tab.key as "all" | "published" | "coming_soon")}
+                  className={`px-4 py-2 text-xs uppercase tracking-[0.2em] font-mono border transition-colors ${
                     filter === tab.key
                       ? "bg-flame text-ink border-flame font-medium"
                       : "border-border text-muted-foreground hover:text-foreground hover:border-foreground"
@@ -183,77 +73,90 @@ function ProductsPage() {
         {/* Products Grid */}
         <section className="px-6 md:px-10 py-16 md:py-24">
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-            {filteredProducts.map((product, i) => (
-              <motion.article
-                key={product.id}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="border border-border bg-card p-8 md:p-10 flex flex-col justify-between space-y-8 hover:border-flame/50 transition-colors"
-              >
-                <div>
-                  {/* Status Badge */}
-                  <div className="flex items-center justify-between mb-6">
-                    <span
-                      className={`text-[0.65rem] uppercase tracking-[0.2em] px-3 py-1 border ${
-                        product.status === "published"
-                          ? "bg-flame text-ink border-flame font-medium"
-                          : "bg-muted text-muted-foreground border-border"
-                      }`}
-                    >
-                      {product.badge}
-                    </span>
-                    <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                      AyushDevX<sup>®</sup>
-                    </span>
+            <AnimatePresence mode="popLayout">
+              {filteredProducts.map((product, idx) => (
+                <motion.div
+                  key={product.id}
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.96 }}
+                  transition={{ duration: 0.4, delay: idx * 0.06 }}
+                  className="border border-border bg-card p-8 flex flex-col justify-between hover:border-flame/50 transition-all duration-300 relative group"
+                >
+                  <div>
+                    {/* Header: Badge & Status */}
+                    <div className="flex items-center justify-between gap-3 mb-4">
+                      <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 bg-flame/15 text-flame border border-flame/30 font-semibold tracking-wider">
+                        {product.badge}
+                      </span>
+                      <span className="text-[11px] font-mono text-muted-foreground uppercase tracking-wider">
+                        {product.status === "published" ? (
+                          <span className="text-emerald-500 font-medium">● Available</span>
+                        ) : (
+                          <span className="text-amber-500 font-medium">◌ Coming Soon</span>
+                        )}
+                      </span>
+                    </div>
+
+                    <h2 className="font-display text-2xl md:text-3xl leading-snug group-hover:text-flame transition-colors">
+                      {product.name}
+                    </h2>
+                    <p className="text-xs md:text-sm text-flame mt-1 font-mono">
+                      {product.tagline}
+                    </p>
+
+                    <p className="mt-4 text-xs md:text-sm text-muted-foreground leading-relaxed">
+                      {product.description}
+                    </p>
+
+                    {/* Features List */}
+                    <div className="mt-6 space-y-2 border-t border-border/60 pt-4">
+                      {product.features.map((feature) => (
+                        <div
+                          key={feature}
+                          className="flex items-center gap-2 text-xs text-foreground/80 font-sans"
+                        >
+                          <span className="text-flame font-bold font-mono">✓</span>
+                          <span>{feature}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
-                  <h2 className="font-display text-3xl md:text-4xl">
-                    {product.name}
-                  </h2>
-                  <p className="mt-2 text-xs uppercase tracking-[0.15em] text-flame font-medium">
-                    {product.tagline}
-                  </p>
-                  <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
-                    {product.description}
-                  </p>
-
-                  {/* Feature Checklist */}
-                  <ul className="mt-6 space-y-2 border-t border-border pt-6">
-                    {product.features.map((feat) => (
-                      <li
-                        key={feat}
-                        className="text-xs text-foreground/85 flex items-center gap-2.5"
+                  {/* Actions Bar */}
+                  <div className="mt-8 pt-5 border-t border-border flex items-center justify-between gap-4">
+                    {product.githubUrl && (
+                      <a
+                        href={product.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs font-mono text-muted-foreground hover:text-foreground flex items-center gap-1.5 transition-colors"
                       >
-                        <span className="text-flame">✓</span>
-                        {feat}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                        <Code2 className="size-3.5" />
+                        <span>Source</span>
+                        <ExternalLink className="size-3" />
+                      </a>
+                    )}
 
-                {/* CTA / Action */}
-                <div className="pt-4 border-t border-border flex items-center justify-between">
-                  {product.status === "published" && product.demoUrl ? (
-                    <Magnetic strength={0.3}>
-                      <Link
-                        to={product.demoUrl}
-                        className="text-xs uppercase tracking-[0.2em] bg-flame text-ink px-6 py-3 inline-block font-medium hover:bg-flame/90 transition-colors"
-                      >
-                        Launch Tool →
-                      </Link>
-                    </Magnetic>
-                  ) : (
-                    <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground italic">
-                      Coming Soon to AI Lab
-                    </span>
-                  )}
-                  <span className="text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground">
-                    Free Tier Available
-                  </span>
-                </div>
-              </motion.article>
-            ))}
+                    {product.demoUrl ? (
+                      <Magnetic strength={0.2}>
+                        <Link
+                          to={product.demoUrl}
+                          className="px-4 py-2 bg-flame text-ink text-xs font-mono uppercase tracking-wider font-semibold hover:bg-flame/90 transition-colors inline-flex items-center gap-1.5"
+                        >
+                          <span>Launch Product</span>
+                          <ArrowRight className="size-3" />
+                        </Link>
+                      </Magnetic>
+                    ) : (
+                      <span className="text-xs font-mono text-muted-foreground/60 italic">
+                        Preview on request
+                      </span>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
         </section>
       </div>

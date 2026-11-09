@@ -5,6 +5,7 @@ import { Magnetic } from "./Magnetic";
 
 const links = [
   { href: "/", label: "Home" },
+  { href: "/certificates", label: "Certificates" },
   { href: "/ai-lab", label: "AI Lab" },
   { href: "/products", label: "Products" },
   { href: "/projects", label: "Projects" },
@@ -37,9 +38,9 @@ export function Nav() {
           </Link>
         </Magnetic>
 
-        {/* Desktop links — show only first 6 to avoid overflow */}
+        {/* Desktop links */}
         <ul className="hidden lg:flex items-center gap-6 text-[0.65rem] uppercase tracking-[0.2em]">
-          {links.slice(1, 7).map((l) => (
+          {links.slice(1, 8).map((l) => (
             <li key={l.href}>
               <Magnetic strength={0.4}>
                 <Link
@@ -53,7 +54,19 @@ export function Nav() {
           ))}
         </ul>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          {/* Resume Link */}
+          <Magnetic strength={0.4}>
+            <a
+              href="/resume/Ayush_Narkhede_Resume_2026.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden sm:inline-block text-[0.65rem] uppercase tracking-[0.2em] px-3 py-1.5 bg-flame/10 text-flame border border-flame/40 hover:bg-flame hover:text-ink transition-colors"
+            >
+              Resume (PDF)
+            </a>
+          </Magnetic>
+
           {/* CTA */}
           <Magnetic strength={0.5}>
             <Link
@@ -100,7 +113,7 @@ export function Nav() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-0 z-40 bg-background/95 backdrop-blur-md flex flex-col items-center justify-center gap-8 lg:hidden"
+            className="fixed inset-0 z-40 bg-background/95 backdrop-blur-md flex flex-col items-center justify-center gap-6 lg:hidden"
           >
             {links.map((l, i) => (
               <motion.div
@@ -108,16 +121,31 @@ export function Nav() {
                 onClick={() => setOpen(false)}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05, duration: 0.4 }}
+                transition={{ delay: i * 0.04, duration: 0.4 }}
               >
                 <Link
                   to={l.href}
-                  className="font-display text-4xl hover:text-flame transition-colors"
+                  className="font-display text-3xl hover:text-flame transition-colors"
                 >
                   {l.label}
                 </Link>
               </motion.div>
             ))}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: links.length * 0.04, duration: 0.4 }}
+              className="mt-4"
+            >
+              <a
+                href="/resume/Ayush_Narkhede_Resume_2026.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-6 py-2.5 bg-flame text-ink font-mono text-sm uppercase tracking-wider font-semibold"
+              >
+                Download Resume (PDF)
+              </a>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

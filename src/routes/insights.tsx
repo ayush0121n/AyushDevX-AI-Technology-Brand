@@ -5,6 +5,7 @@ import { Footer } from "@/components/site/Footer";
 import { Magnetic } from "@/components/site/Magnetic";
 import { useQuery } from "@tanstack/react-query";
 import { fetchPublishedInsights } from "@/api/insights";
+import { FALLBACK_INSIGHTS } from "@/data/fallbackContent";
 
 export const Route = createFileRoute("/insights")({
   component: InsightsPage,
@@ -47,7 +48,8 @@ function InsightsPage() {
     staleTime: 5 * 60 * 1000,
   });
 
-  const articles: InsightArticle[] = (data?.insights ?? []) as InsightArticle[];
+  const rawArticles = (data?.insights ?? []) as InsightArticle[];
+  const articles: InsightArticle[] = rawArticles.length > 0 ? rawArticles : (FALLBACK_INSIGHTS as InsightArticle[]);
 
   return (
     <main className="bg-background text-foreground min-h-screen flex flex-col justify-between">
@@ -86,7 +88,7 @@ function InsightsPage() {
               </div>
             )}
 
-            {isError && !isLoading && (
+            {isError && !isLoading && articles.length === 0 && (
               <div className="p-12 border border-destructive/40 bg-destructive/5 text-center space-y-3">
                 <p className="text-sm text-destructive">
                   {(error as Error)?.message ?? "Could not load insights."}

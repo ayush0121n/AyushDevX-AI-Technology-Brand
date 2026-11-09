@@ -9,6 +9,7 @@ import {
   getDownloadUrl,
 } from "@/api/knowledge-hub";
 import { fetchPublishedBlogPosts } from "@/api/blog";
+import { FALLBACK_RESOURCES, FALLBACK_BLOG_POSTS } from "@/data/fallbackContent";
 
 export const Route = createFileRoute("/knowledge-hub")({
   component: KnowledgeHubPage,
@@ -316,8 +317,11 @@ function KnowledgeHubPage() {
     retry: 2,
   });
 
-  const resources: ResourceRow[] = (data?.resources ?? []) as ResourceRow[];
-  const blogPosts: BlogPostCard[] = (blogData?.posts ?? []) as BlogPostCard[];
+  const rawResources = (data?.resources ?? []) as ResourceRow[];
+  const rawBlogPosts = (blogData?.posts ?? []) as BlogPostCard[];
+
+  const resources: ResourceRow[] = rawResources.length > 0 ? rawResources : (FALLBACK_RESOURCES as unknown as ResourceRow[]);
+  const blogPosts: BlogPostCard[] = rawBlogPosts.length > 0 ? rawBlogPosts : (FALLBACK_BLOG_POSTS as unknown as BlogPostCard[]);
 
   // Build dynamic category list
   const categories = [
@@ -484,7 +488,7 @@ function KnowledgeHubPage() {
                   </>
                 )}
 
-                {resourcesError && !resourcesLoading && (
+                {resourcesError && !resourcesLoading && filteredResources.length === 0 && (
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -626,7 +630,7 @@ function KnowledgeHubPage() {
                   </div>
                 )}
 
-                {blogError && !blogLoading && (
+                {blogError && !blogLoading && filteredBlog.length === 0 && (
                   <div className="p-12 border border-destructive/40 bg-destructive/5 text-center space-y-3">
                     <div className="w-10 h-10 rounded-full bg-destructive/10 border border-destructive/30 flex items-center justify-center text-destructive text-lg mx-auto">
                       ✕

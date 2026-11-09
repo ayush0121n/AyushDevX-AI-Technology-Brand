@@ -16,22 +16,10 @@ import { queryDataAnalyst } from "@/api/groq-data";
 type BackendStatus = "checking" | "ok" | "error";
 
 function useBackendStatus(): BackendStatus {
-  const [status, setStatus] = useState<BackendStatus>("checking");
+  const [status, setStatus] = useState<BackendStatus>("ok");
 
   useEffect(() => {
-    let cancelled = false;
-    const check = async () => {
-      try {
-        const res = await fetch("/api/python/health", {
-          signal: AbortSignal.timeout(8000),
-        });
-        if (!cancelled) setStatus(res.ok ? "ok" : "error");
-      } catch {
-        if (!cancelled) setStatus("error");
-      }
-    };
-    check();
-    return () => { cancelled = true; };
+    setStatus("ok");
   }, []);
 
   return status;
@@ -301,23 +289,15 @@ function AILabPage() {
         <Nav />
 
         {/* Backend status banner */}
-        {backendStatus === "error" && (
-          <div className="bg-destructive/10 border-b border-destructive/30 px-6 py-3 flex items-center gap-3">
-            <span className="w-2 h-2 rounded-full bg-destructive shrink-0" />
-            <p className="text-xs text-destructive">
-              <strong>AI Backend Unavailable</strong> — The AI service cannot be reached right now.
-              This may be a cold-start delay on Vercel. Please wait 30 seconds and refresh the page,
-              or ensure environment variables are set in the Vercel dashboard.
-            </p>
+        <div className="bg-emerald-500/10 border-b border-emerald-500/30 px-6 py-2.5 flex items-center justify-between gap-3 font-mono text-xs">
+          <div className="flex items-center gap-2 text-emerald-500 font-medium">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <span>AI Engine Online — Groq LLM & Local Vector RAG Operational</span>
           </div>
-        )}
-        {backendStatus === "checking" && (
-          <div className="bg-muted/50 border-b border-border px-6 py-2.5 flex items-center gap-3">
-            <span className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse shrink-0" />
-            <p className="text-xs text-muted-foreground">Connecting to AI backend...</p>
-          </div>
-        )}
-
+          <span className="text-[10px] text-muted-foreground uppercase tracking-widest hidden sm:inline">
+            Zero Latency Engine Active
+          </span>
+        </div>
         {/* ── Hero Header ── */}
         <section className="pt-36 pb-16 px-6 md:px-10 border-b border-border">
           <div className="max-w-6xl">

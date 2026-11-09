@@ -36,10 +36,13 @@ function Index() {
           items={[
             "AI / ML",
             "MERN Stack",
+            "Agentic AI",
             "TensorFlow",
             "React",
             "Node.js",
-            "Oracle Cloud",
+            "Oracle OCI",
+            "nasscom Gold",
+            "ServiceNow CSA",
           ]}
         />
       </section>

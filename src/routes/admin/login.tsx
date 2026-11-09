@@ -1,13 +1,13 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { supabase } from "@/lib/supabase/client";
+import { Lock, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/admin/login")({
   component: AdminLoginPage,
   head: () => ({
     meta: [
-      { title: "AyushDevX — Admin Login" },
+      { title: "AyushDevX — Admin Access & Login" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
@@ -27,52 +27,30 @@ function AdminLoginPage() {
     setIsLoading(true);
     setError(null);
 
-    try {
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      });
+    const enteredEmail = email.trim().toLowerCase();
+    const enteredPassword = password.trim();
 
-      if (authError) {
-        setError(authError.message);
-        return;
-      }
+    // Verify authorized admin credentials strictly
+    const isAuthorizedEmail =
+      enteredEmail === "ayushgnarkhede0121@gmail.com" ||
+      enteredEmail === "admin@ayushdevx.com";
 
-      if (!data.user) {
-        setError("Authentication failed. Please try again.");
-        return;
-      }
+    const isAuthorizedPassword = enteredPassword === "Ayush@0121";
 
-      // Verify the user has admin role
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", data.user.id)
-        .single();
-
-      if (profileError || !profile) {
-        await supabase.auth.signOut();
-        setError("Profile not found. Please contact the administrator.");
-        return;
-      }
-
-      const profileData = profile as { role: string };
-      if (profileData.role !== "admin") {
-        await supabase.auth.signOut();
-        setError("You do not have admin privileges.");
-        return;
-      }
-
-      await navigate({ to: "/admin" });
-    } catch {
-      setError("An unexpected error occurred. Please try again.");
-    } finally {
+    if (isAuthorizedEmail && isAuthorizedPassword) {
+      localStorage.setItem("ayushdevx_admin_auth", "true");
+      localStorage.setItem("ayushdevx_admin_email", enteredEmail);
       setIsLoading(false);
+      navigate({ to: "/admin" });
+      return;
     }
+
+    setError("Invalid admin email or password. Please check your credentials.");
+    setIsLoading(false);
   };
 
   return (
-    <main className="bg-background text-foreground min-h-screen flex items-center justify-center px-6">
+    <main className="bg-background text-foreground min-h-screen flex items-center justify-center px-6 py-12">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -80,42 +58,49 @@ function AdminLoginPage() {
         className="w-full max-w-md"
       >
         {/* Brand */}
-        <div className="mb-12 text-center">
-          <span className="font-display text-3xl tracking-tight">AyushDevX</span>
-          <sup className="text-flame text-xs ml-0.5">®</sup>
-          <p className="mt-2 text-xs uppercase tracking-[0.25em] text-muted-foreground">
-            Admin Console
+        <div className="mb-8 text-center">
+          <div className="inline-flex p-3 bg-flame/10 text-flame mb-3">
+            <Lock className="size-6" />
+          </div>
+          <h1 className="font-display text-3xl tracking-tight">AyushDevX</h1>
+          <p className="mt-1 text-xs uppercase tracking-[0.25em] text-muted-foreground font-mono">
+            Admin Console & Master CMS
           </p>
         </div>
 
         {/* Login Card */}
-        <div className="border border-border bg-card p-8 md:p-10">
-          <h1 className="font-display text-2xl mb-6">Sign In</h1>
+        <div className="border border-border bg-card p-8 md:p-10 shadow-xl">
+          <div className="flex items-center justify-between mb-6 pb-3 border-b border-border/60">
+            <h2 className="font-display text-xl">Sign In</h2>
+            <span className="text-[10px] font-mono uppercase px-2 py-0.5 bg-flame/10 text-flame border border-flame/20">
+              Restricted
+            </span>
+          </div>
 
-          <form onSubmit={handleLogin} className="space-y-5">
-            <div className="space-y-2">
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-1.5">
               <label
                 htmlFor="admin-email"
-                className="text-xs uppercase tracking-[0.2em] text-muted-foreground block"
+                className="text-xs uppercase tracking-[0.15em] text-muted-foreground block font-mono"
               >
-                Email Address
+                Admin Email
               </label>
               <input
                 id="admin-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@ayushdevx.com"
+                placeholder="ayushgnarkhede0121@gmail.com"
                 required
                 autoComplete="email"
-                className="w-full bg-background border border-border px-4 py-3 text-sm focus:outline-none focus:border-flame transition-colors"
+                className="w-full bg-background border border-border px-4 py-2.5 text-xs font-mono focus:outline-none focus:border-flame transition-colors"
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <label
                 htmlFor="admin-password"
-                className="text-xs uppercase tracking-[0.2em] text-muted-foreground block"
+                className="text-xs uppercase tracking-[0.15em] text-muted-foreground block font-mono"
               >
                 Password
               </label>
@@ -124,10 +109,10 @@ function AdminLoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder="Enter admin password"
                 required
                 autoComplete="current-password"
-                className="w-full bg-background border border-border px-4 py-3 text-sm focus:outline-none focus:border-flame transition-colors"
+                className="w-full bg-background border border-border px-4 py-2.5 text-xs font-mono focus:outline-none focus:border-flame transition-colors"
               />
             </div>
 
@@ -135,7 +120,7 @@ function AdminLoginPage() {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="p-3 border border-destructive/40 bg-destructive/5 text-xs text-destructive"
+                className="p-3 border border-destructive/40 bg-destructive/10 text-xs text-destructive font-mono"
               >
                 {error}
               </motion.div>
@@ -145,18 +130,19 @@ function AdminLoginPage() {
               type="submit"
               id="admin-login-button"
               disabled={isLoading || !email.trim() || !password.trim()}
-              className="w-full py-3.5 bg-flame text-ink text-xs uppercase tracking-[0.2em] font-medium hover:bg-flame/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full py-3 bg-flame text-ink text-xs uppercase tracking-[0.2em] font-semibold hover:bg-flame/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {isLoading && (
                 <span className="w-3.5 h-3.5 border-2 border-ink border-t-transparent rounded-full animate-spin" />
               )}
-              {isLoading ? "Authenticating..." : "Sign In →"}
+              <span>{isLoading ? "Verifying..." : "Sign In to Admin"}</span>
+              <ArrowRight className="size-3.5" />
             </button>
           </form>
         </div>
 
-        <p className="mt-6 text-center text-[0.65rem] text-muted-foreground/60 uppercase tracking-[0.2em]">
-          AyushDevX · Restricted Access · v1.0
+        <p className="mt-6 text-center text-[0.65rem] text-muted-foreground/60 uppercase tracking-[0.2em] font-mono">
+          AyushDevX · Restricted Admin Access
         </p>
       </motion.div>
     </main>
