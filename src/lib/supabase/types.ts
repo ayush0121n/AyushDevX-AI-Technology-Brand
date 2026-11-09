@@ -2,7 +2,7 @@
  * AyushDevX — Supabase Database Types
  *
  * Auto-generate this file by running:
- *   npx supabase gen types typescript --project-id zkgixwywetajnogrihfy > src/lib/supabase/types.ts
+ *   npx supabase gen types typescript --project-id <PROJECT_REF> > src/lib/supabase/types.ts
  *
  * Until then, this file provides a typed placeholder.
  */

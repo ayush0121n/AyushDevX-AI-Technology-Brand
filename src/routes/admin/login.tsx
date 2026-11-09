@@ -20,6 +20,16 @@ function AdminLoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Secure SHA-256 password hash comparison (Zero plaintext password in code)
+  const sha256Hex = async (text: string) => {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(text);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(hashBuffer))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !password.trim() || isLoading) return;
@@ -28,14 +38,16 @@ function AdminLoginPage() {
     setError(null);
 
     const enteredEmail = email.trim().toLowerCase();
-    const enteredPassword = password.trim();
+    const enteredPasswordHash = await sha256Hex(password.trim());
 
-    // Verify authorized admin credentials strictly
+    // Verify authorized admin credentials strictly via one-way cryptographic hash
     const isAuthorizedEmail =
       enteredEmail === "ayushgnarkhede0121@gmail.com" ||
       enteredEmail === "admin@ayushdevx.com";
 
-    const isAuthorizedPassword = enteredPassword === "Ayush@0121";
+    // One-way SHA-256 hash
+    const AUTH_HASH = "3ab7caf67e251927c8552af79ac58aa22c536d99c124e36532dff93f6dd238f4";
+    const isAuthorizedPassword = enteredPasswordHash === AUTH_HASH;
 
     if (isAuthorizedEmail && isAuthorizedPassword) {
       localStorage.setItem("ayushdevx_admin_auth", "true");

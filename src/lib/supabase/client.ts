@@ -1,19 +1,21 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./types";
 
-const supabaseUrl =
-  import.meta.env.VITE_SUPABASE_URL || "https://zkgixwywetajnogrihfy.supabase.co";
-const supabaseAnonKey =
-  import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dummy_anon_fallback";
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "";
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "";
 
 /**
  * Browser-side Supabase client.
- * Configured with resilient fallbacks so the app renders even during offline/DNS drops.
+ * Uses environment variables securely; if missing, provides a dummy no-op client to prevent app crashes.
  */
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true,
+export const supabase = createClient<Database>(
+  supabaseUrl || "https://placeholder-project.supabase.co",
+  supabaseAnonKey || "placeholder-anon-key",
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+    },
   },
-});
+);
