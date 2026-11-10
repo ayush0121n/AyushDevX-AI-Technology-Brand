@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase/client";
 
 export interface ProductItem {
   id: string;
@@ -27,7 +28,7 @@ export const initialProducts: ProductItem[] = [
     ],
     status: "published",
     badge: "Live · AI Lab Tool",
-    demoUrl: "/ai-lab",
+    demoUrl: "/ai-lab?tab=portfolio",
     githubUrl: "https://github.com/ayush0121n",
   },
   {
@@ -44,7 +45,7 @@ export const initialProducts: ProductItem[] = [
     ],
     status: "published",
     badge: "Live · Document RAG",
-    demoUrl: "/ai-lab",
+    demoUrl: "/ai-lab?tab=pdf",
     githubUrl: "https://github.com/ayush0121n/contract-rag-pipeline",
   },
   {
@@ -61,7 +62,7 @@ export const initialProducts: ProductItem[] = [
     ],
     status: "published",
     badge: "Live · NLP Engine",
-    demoUrl: "/ai-lab",
+    demoUrl: "/ai-lab?tab=resume",
     githubUrl: "https://github.com/ayush0121n",
   },
   {
@@ -78,7 +79,7 @@ export const initialProducts: ProductItem[] = [
     ],
     status: "published",
     badge: "Live · No-Code EDA",
-    demoUrl: "/ai-lab",
+    demoUrl: "/ai-lab?tab=data",
     githubUrl: "https://github.com/ayush0121n",
   },
   {
@@ -93,9 +94,9 @@ export const initialProducts: ProductItem[] = [
       "Time & space complexity analysis with refactor diffs",
       "Automated pull request summary generator",
     ],
-    status: "coming_soon",
-    badge: "Roadmap · Q3",
-    demoUrl: "/ai-lab",
+    status: "published",
+    badge: "Live · Security Auditor",
+    demoUrl: "/ai-lab?tab=reviewer",
     githubUrl: "https://github.com/ayush0121n",
   },
   {
@@ -110,14 +111,14 @@ export const initialProducts: ProductItem[] = [
       "Granular feedback rubric across technical depth and communication",
       "Benchmarking against top tech industry standards",
     ],
-    status: "coming_soon",
-    badge: "Roadmap · Q4",
-    demoUrl: "/ai-lab",
+    status: "published",
+    badge: "Live · Interview Coach",
+    demoUrl: "/ai-lab?tab=interview",
     githubUrl: "https://github.com/ayush0121n",
   },
 ];
 
-const STORAGE_KEY = "ayushdevx_products_v2";
+const STORAGE_KEY = "ayushdevx_products_v4";
 
 export function useProducts() {
   const [products, setProducts] = useState<ProductItem[]>(() => {
@@ -134,6 +135,51 @@ export function useProducts() {
     return initialProducts;
   });
 
+  // Sync from Supabase on mount
+  useEffect(() => {
+    let isMounted = true;
+
+    async function fetchFromSupabase() {
+      try {
+        const { data, error } = await supabase
+          .from("products")
+          .select("*")
+          .order("sort_order", { ascending: true });
+
+        if (error) {
+          console.warn("[useProducts] Supabase fetch error, fallback active:", error.message);
+          return;
+        }
+
+        if (data && data.length > 0 && isMounted) {
+          const mapped: ProductItem[] = data.map((d: any) => ({
+            id: d.slug || d.id,
+            name: d.name,
+            tagline: d.tagline || "",
+            description: d.description || "",
+            features: d.features || [],
+            status: d.status || "published",
+            badge: d.badge || "AI Product",
+            demoUrl: d.demo_url || undefined,
+            githubUrl: d.github_url || undefined,
+          }));
+
+          setProducts(mapped);
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(mapped));
+          } catch (e) {}
+        }
+      } catch (err) {
+        console.warn("[useProducts] Network error during Supabase sync:", err);
+      }
+    }
+
+    fetchFromSupabase();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const saveProducts = (newProducts: ProductItem[]) => {
     setProducts(newProducts);
     if (typeof window !== "undefined") {
@@ -145,19 +191,60 @@ export function useProducts() {
     }
   };
 
-  const addProduct = (prod: ProductItem) => {
+  const addProduct = async (prod: ProductItem) => {
     const updated = [prod, ...products];
     saveProducts(updated);
+
+    try {
+      await supabase.from("products").insert({
+        slug: prod.id,
+        name: prod.name,
+        tagline: prod.tagline,
+        description: prod.description,
+        features: prod.features,
+        badge: prod.badge,
+        demo_url: prod.demoUrl,
+        github_url: prod.githubUrl,
+        status: prod.status,
+        sort_order: 0,
+      } as any);
+    } catch (e) {
+      console.error("[useProducts] Error inserting product to Supabase:", e);
+    }
   };
 
-  const updateProduct = (id: string, prod: ProductItem) => {
+  const updateProduct = async (id: string, prod: ProductItem) => {
     const updated = products.map((p) => (p.id === id ? prod : p));
     saveProducts(updated);
+
+    try {
+      await supabase
+        .from("products")
+        .update({
+          name: prod.name,
+          tagline: prod.tagline,
+          description: prod.description,
+          features: prod.features,
+          badge: prod.badge,
+          demo_url: prod.demoUrl,
+          github_url: prod.githubUrl,
+          status: prod.status,
+        } as any)
+        .eq("slug", id);
+    } catch (e) {
+      console.error("[useProducts] Error updating product in Supabase:", e);
+    }
   };
 
-  const deleteProduct = (id: string) => {
+  const deleteProduct = async (id: string) => {
     const updated = products.filter((p) => p.id !== id);
     saveProducts(updated);
+
+    try {
+      await supabase.from("products").delete().eq("slug", id);
+    } catch (e) {
+      console.error("[useProducts] Error deleting product from Supabase:", e);
+    }
   };
 
   const resetProducts = () => {

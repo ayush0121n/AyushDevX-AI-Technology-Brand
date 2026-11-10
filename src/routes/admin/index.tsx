@@ -25,6 +25,8 @@ import {
   Search,
   Sparkles,
   Package,
+  Upload,
+  RefreshCw,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin/")({
@@ -372,6 +374,72 @@ function MasterAdminPage() {
   const [aiMlStr, setAiMlStr] = useState(siteData.skills.aiMl.join(", "));
   const [fullStackStr, setFullStackStr] = useState(siteData.skills.fullStack.join(", "));
   const [cloudStr, setCloudStr] = useState(siteData.skills.dataCloud.join(", "));
+
+  // ── RESUME STATE ──
+  const [liveResumeUrl, setLiveResumeUrl] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("ayushdevx_live_resume_url") || "/resume/Ayush_Narkhede_Resume_2026.pdf";
+    }
+    return "/resume/Ayush_Narkhede_Resume_2026.pdf";
+  });
+  const [resumeTitle, setResumeTitle] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("ayushdevx_live_resume_title") || "Ayush Narkhede ATS Resume (A4)";
+    }
+    return "Ayush Narkhede ATS Resume (A4)";
+  });
+  const [isUploadingResume, setIsUploadingResume] = useState(false);
+
+  const handleResumeFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.type !== "application/pdf" && !file.name.endsWith(".pdf")) {
+        alert("Please upload a valid PDF document.");
+        return;
+      }
+      setIsUploadingResume(true);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const dataUrl = reader.result as string;
+        setLiveResumeUrl(dataUrl);
+        setResumeTitle(file.name.replace(".pdf", ""));
+        if (typeof window !== "undefined") {
+          localStorage.setItem("ayushdevx_live_resume_url", dataUrl);
+          localStorage.setItem("ayushdevx_live_resume_title", file.name.replace(".pdf", ""));
+        }
+        setIsUploadingResume(false);
+        setSaveSuccessMsg("New Master Resume PDF successfully uploaded and activated!");
+        setTimeout(() => setSaveSuccessMsg(""), 3500);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSaveResumeUrl = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!liveResumeUrl.trim()) return;
+    if (typeof window !== "undefined") {
+      localStorage.setItem("ayushdevx_live_resume_url", liveResumeUrl.trim());
+      localStorage.setItem("ayushdevx_live_resume_title", resumeTitle.trim());
+    }
+    setSaveSuccessMsg("Resume URL and title successfully updated!");
+    setTimeout(() => setSaveSuccessMsg(""), 3500);
+  };
+
+  const handleResetResume = () => {
+    if (confirm("Reset resume to the standard default 2026 ATS PDF?")) {
+      const defaultUrl = "/resume/Ayush_Narkhede_Resume_2026.pdf";
+      const defaultTitle = "Ayush Narkhede ATS Resume (A4)";
+      setLiveResumeUrl(defaultUrl);
+      setResumeTitle(defaultTitle);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("ayushdevx_live_resume_url", defaultUrl);
+        localStorage.setItem("ayushdevx_live_resume_title", defaultTitle);
+      }
+      setSaveSuccessMsg("Resume reset to default 2026 PDF.");
+      setTimeout(() => setSaveSuccessMsg(""), 3500);
+    }
+  };
 
   const handleSaveSkills = (e: React.FormEvent) => {
     e.preventDefault();
@@ -994,38 +1062,122 @@ function MasterAdminPage() {
 
           {/* ───────────────────────────────────────────────────────────── */}
           {/* TAB 7: RESUME */}
-          {/* ───────────────────────────────────────────────────────────── */}
           {activeSection === "resume" && (
             <div className="max-w-4xl">
               <div className="pb-6 mb-6 border-b border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h2 className="font-display text-2xl md:text-3xl">Master Resume Management</h2>
                   <p className="text-xs text-muted-foreground font-mono mt-1">
-                    Current active ATS-optimized 1-page A4 resume for recruiter downloads.
+                    Add, update, replace, or delete your ATS-optimized Master Resume PDF for recruiter downloads.
                   </p>
                 </div>
-                <a
-                  href="/resume/Ayush_Narkhede_Resume_2026.pdf"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-flame text-ink text-xs font-mono uppercase font-semibold hover:bg-flame/90"
-                >
-                  <Download className="size-4" />
-                  <span>Download Live PDF</span>
-                </a>
+                <div className="flex items-center gap-2">
+                  <a
+                    href={liveResumeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-flame text-ink text-xs font-mono uppercase font-semibold hover:bg-flame/90 transition-colors"
+                  >
+                    <Download className="size-4" />
+                    <span>Download Live PDF</span>
+                  </a>
+                  <button
+                    onClick={handleResetResume}
+                    className="inline-flex items-center gap-2 px-3.5 py-2.5 border border-border hover:border-foreground text-xs font-mono uppercase text-muted-foreground hover:text-foreground transition-colors"
+                    title="Reset to default PDF"
+                  >
+                    <RotateCcw className="size-3.5" />
+                    <span>Reset</span>
+                  </button>
+                </div>
               </div>
 
+              {/* Management Controls: Upload & URL update */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                {/* Upload New PDF File */}
+                <div className="border border-border bg-card p-5 space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Upload className="size-4 text-flame" />
+                    <h3 className="font-display text-base">Upload New Resume PDF</h3>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Select a local PDF file to immediately replace the active resume across the website.
+                  </p>
+                  <label className="block w-full border-2 border-dashed border-border hover:border-flame/60 p-6 text-center cursor-pointer transition-colors bg-background">
+                    <span className="text-xs font-mono text-flame block mb-1">
+                      {isUploadingResume ? "Uploading PDF..." : "Click to select new PDF file"}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground block font-mono">
+                      Accepts standard PDF (Max 10MB)
+                    </span>
+                    <input
+                      type="file"
+                      accept="application/pdf"
+                      onChange={handleResumeFileUpload}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+
+                {/* Edit Resume Meta & URL */}
+                <form onSubmit={handleSaveResumeUrl} className="border border-border bg-card p-5 space-y-4 flex flex-col justify-between">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Edit3 className="size-4 text-flame" />
+                      <h3 className="font-display text-base">Resume Link & Metadata</h3>
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-mono uppercase mb-1">Document Title / Label</label>
+                      <input
+                        type="text"
+                        value={resumeTitle}
+                        onChange={(e) => setResumeTitle(e.target.value)}
+                        className="w-full bg-background border border-border p-2 text-xs font-mono focus:border-flame focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-mono uppercase mb-1">Live URL Path</label>
+                      <input
+                        type="text"
+                        value={liveResumeUrl}
+                        onChange={(e) => setLiveResumeUrl(e.target.value)}
+                        placeholder="/resume/Ayush_Narkhede_Resume_2026.pdf"
+                        className="w-full bg-background border border-border p-2 text-xs font-mono focus:border-flame focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-2 pt-2">
+                    <button
+                      type="submit"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-flame text-ink text-xs font-mono uppercase font-semibold hover:bg-flame/90"
+                    >
+                      <Save className="size-3.5" />
+                      <span>Save URL</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              {/* Active Resume Preview */}
               <div className="border border-border bg-card p-6">
+                <div className="flex items-center justify-between pb-3 mb-4 border-b border-border/60">
+                  <div className="flex items-center gap-2">
+                    <FileText className="size-4 text-flame" />
+                    <span className="font-display text-base">{resumeTitle}</span>
+                  </div>
+                  <span className="text-[10px] font-mono px-2 py-0.5 bg-emerald-500/10 text-emerald-500 border border-emerald-500/30">
+                    Active Live
+                  </span>
+                </div>
                 <div className="aspect-[1/1.4] w-full max-w-2xl mx-auto border border-border/80 overflow-hidden bg-muted/20">
                   <iframe
-                    src="/resume/Ayush_Narkhede_Resume_2026.pdf#toolbar=0"
+                    src={`${liveResumeUrl}#toolbar=0`}
                     title="Resume Preview"
                     className="size-full"
                   />
                 </div>
               </div>
-            </div>
-          )}
+            </div>          )}
         </section>
       </div>
 

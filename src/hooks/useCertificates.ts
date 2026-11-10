@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { CertificateGalleryItem, initialCertificates } from "@/data/certificatesData";
+import { supabase } from "@/lib/supabase/client";
 
-const STORAGE_KEY = "ayushdevx_certificates_v1";
+const STORAGE_KEY = "ayushdevx_certificates_v2";
 
 export function useCertificates() {
   const [certificates, setCertificates] = useState<CertificateGalleryItem[]>(() => {
@@ -18,7 +19,59 @@ export function useCertificates() {
     return initialCertificates;
   });
 
-  const saveCertificates = (certs: CertificateGalleryItem[]) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Sync from Supabase on mount
+  useEffect(() => {
+    let isMounted = true;
+
+    async function fetchFromSupabase() {
+      try {
+        setIsLoading(true);
+        const { data, error } = await supabase
+          .from("certificates")
+          .select("*")
+          .order("sort_order", { ascending: true });
+
+        if (error) {
+          console.warn("[useCertificates] Supabase fetch error, fallback active:", error.message);
+          return;
+        }
+
+        if (data && data.length > 0 && isMounted) {
+          const mapped: CertificateGalleryItem[] = data.map((d: any) => ({
+            id: d.id,
+            title: d.title,
+            issuer: d.issuer,
+            category: d.category || "AI & GenAI",
+            date: d.issue_date || "2026",
+            image: d.image_url || "/certificates/Founderz_Microsoft_Agent_Architect.png",
+            pdf: d.pdf_url || undefined,
+            badge: d.badge || undefined,
+          }));
+
+          setCertificates(mapped);
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(mapped));
+          } catch (e) {
+            // ignore quota
+          }
+        }
+      } catch (err) {
+        console.warn("[useCertificates] Network error during Supabase sync:", err);
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    }
+
+    fetchFromSupabase();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const saveToLocal = (certs: CertificateGalleryItem[]) => {
     setCertificates(certs);
     if (typeof window !== "undefined") {
       try {
@@ -29,25 +82,56 @@ export function useCertificates() {
     }
   };
 
-  const addCertificate = (cert: CertificateGalleryItem) => {
+  const addCertificate = async (cert: CertificateGalleryItem) => {
     const updated = [cert, ...certificates];
-    saveCertificates(updated);
+    saveToLocal(updated);
+
+    // Sync to Supabase in background
+    try {
+      await supabase.from("certificates").insert({
+        title: cert.title,
+        issuer: cert.issuer,
+        issue_date: cert.date,
+        category: cert.category,
+        image_url: cert.image,
+        pdf_url: cert.pdf,
+        badge: cert.badge,
+        status: "published",
+        sort_order: 0,
+      } as any);
+    } catch (e) {
+      console.error("[useCertificates] Error inserting certificate to Supabase:", e);
+    }
   };
 
-  const deleteCertificate = (id: string) => {
+  const deleteCertificate = async (id: string) => {
+    // 1. Optimistic local update so UI reflects immediately
     const updated = certificates.filter((c) => c.id !== id);
-    saveCertificates(updated);
+    saveToLocal(updated);
+
+    // 2. Persist deletion in Supabase
+    try {
+      // Delete by UUID or by title
+      const targetCert = certificates.find((c) => c.id === id);
+      if (id.includes("-") && id.length === 36) {
+        await supabase.from("certificates").delete().eq("id", id);
+      } else if (targetCert) {
+        await supabase.from("certificates").delete().eq("title", targetCert.title);
+      }
+    } catch (e) {
+      console.error("[useCertificates] Error deleting certificate from Supabase:", e);
+    }
   };
 
   const resetToDefault = () => {
-    saveCertificates(initialCertificates);
+    saveToLocal(initialCertificates);
   };
 
   return {
     certificates,
+    isLoading,
     addCertificate,
     deleteCertificate,
     resetToDefault,
   };
 }
-
